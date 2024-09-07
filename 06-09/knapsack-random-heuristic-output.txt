@@ -1,0 +1,11 @@
+[ CONSTRUCTIVE RANDOM ]
+avg: 5.78
+best solution:
+7
+3 0 1 
+
+[ CONSTRUCTIVE RANDOM with PENALTY ]
+avg: -5.46
+best solution:
+7
+0 1 3 
