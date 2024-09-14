@@ -18,7 +18,7 @@ int constructive_greedy_randomized(int n, int Q, const vector<pair<int, int>> &v
         values.push_back(value);
     }
 
-    float treshold = min_value + (1 - a) * (max_value - min_value);
+    float treshold = max_value - a * (max_value - min_value);
     vector<int> rc, nrc;
     for (int i=0; i<n; i++) {
         if (values[i] > treshold) rc.push_back(i);
