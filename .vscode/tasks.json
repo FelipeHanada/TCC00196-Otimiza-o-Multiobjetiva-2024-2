@@ -1,9 +1,10 @@
 {
+    "version": "2.0.0",
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "C/C++: g++.exe arquivo de build ativo",
-            "command": "C:\\TDM-GCC-64\\bin\\g++.exe",
+            "label": "C/C++: g++.exe build active file",
+            "command": "C:\\msys64\\ucrt64\\bin\\g++.exe",
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
@@ -21,8 +22,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "detail": "Tarefa gerada pelo Depurador."
+            "detail": "compiler: C:\\msys64\\ucrt64\\bin\\g++.exe"
         }
-    ],
-    "version": "2.0.0"
+    ]
 }
