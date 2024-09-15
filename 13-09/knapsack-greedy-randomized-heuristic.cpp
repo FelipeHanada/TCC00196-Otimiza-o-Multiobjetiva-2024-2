@@ -2,62 +2,76 @@
 using namespace std;
 
 
-int constructive_greedy_randomized(int n, int Q, const vector<pair<int, int>> &v, float a, vector<int> &s) {
+pair<int, int> constructive_greedy_randomized(int n, int Q, const vector<pair<int, int>> &v, float t, float a, vector<int> &s) {
+    auto start = chrono::high_resolution_clock::now();
+    
     int total_profit = 0;
+    int curr_Q = Q;
 
     vector<float> values;
-    float min_value = numeric_limits<float>::max(),
-          max_value = numeric_limits<float>::min();
-
     for (int i=0; i<n; i++) {
         float value = v[i].first / (float) v[i].second;
-
-        min_value = min(min_value, value);
-        max_value = max(max_value, value);
-
         values.push_back(value);
     }
 
-    float treshold = max_value - a * (max_value - min_value);
-    vector<int> rc, nrc;
-    for (int i=0; i<n; i++) {
-        if (values[i] > treshold) rc.push_back(i);
-        else nrc.push_back(i);
-    }
+    vector<int> c(v.size()), c_value_ordered(v.size());
+    iota(c.begin(), c.end(), 0);
+    iota(c_value_ordered.begin(), c_value_ordered.end(), 0);
 
-    sort(rc.begin(), rc.end(), [&](const int x, const int y) {
+    sort(c.rbegin(), c.rend(), [&](const int x, const int y) {
         return v[x].second < v[y].second;
     });
 
-    sort(nrc.begin(), nrc.end(), [&](const int x, const int y) {
-        return values[x] > values[y];
+    sort(c_value_ordered.rbegin(), c_value_ordered.rend(), [&](const int x, const int y) {
+        return values[x] < values[y];
     });
 
-    while (rc.size() > 0 && Q < v[(*rc.rbegin())].second) {
-        rc.pop_back();
+    while (c.size() > 0 && v[*c.begin()].second > curr_Q) {
+        c_value_ordered.erase(
+            remove(c_value_ordered.begin(), c_value_ordered.end(), *c.begin()),
+            c_value_ordered.end()
+        );
+        c.erase(c.begin());
     }
 
-    while (rc.size() > 0 && Q >= v[rc[0]].first) {
-        auto g = rc.begin() + (rand() % rc.size());
-        s.push_back(*g);
-        total_profit += v[*g].first;
-        Q -= v[*g].second;
-        rc.erase(g);
+    while (c.size() > 0) {
+        auto current = chrono::high_resolution_clock::now();
+        if (chrono::duration<float>(current - start).count() > t)
+            break;
 
-        while (rc.size() > 0 && Q < v[(*rc.rbegin())].second) {
-           rc.pop_back();
+        float min_value = values[c_value_ordered.back()],
+              max_value = values[c_value_ordered.front()];
+
+        float threshold = max_value - a * (max_value - min_value);
+
+        auto rc_end = lower_bound(
+            c_value_ordered.begin(),
+            c_value_ordered.end(),
+            threshold,
+            [&](const int x, const float threshold) {
+                return values[x] >= threshold;
+            }
+        );
+
+        int g = c_value_ordered[rand() % (distance(c_value_ordered.begin(), rc_end))];
+
+        total_profit += v[g].first;
+        curr_Q -= v[g].second;
+        s.push_back(g);
+        
+        c.erase(remove(c.begin(), c.end(), g), c.end());
+        c_value_ordered.erase(remove(c_value_ordered.begin(), c_value_ordered.end(), g), c_value_ordered.end());
+
+        while (c.size() > 0 && v[*c.begin()].second > curr_Q) {
+            c_value_ordered.erase(
+                remove(c_value_ordered.begin(), c_value_ordered.end(), *c.begin()),
+                c_value_ordered.end()
+            );
+            c.erase(c.begin());
         }
     }
 
-    for (int g : nrc) {
-        if (v[g].second > Q) continue;
-
-        total_profit += v[g].first;
-        Q -= v[g].second;
-        s.push_back(g);
-    }
-
-    return total_profit;
+    return { total_profit, Q - curr_Q };
 }
 
 int main() {
@@ -82,12 +96,15 @@ int main() {
     vector<int> s;
     for (int i=0; i<=100; i++) {
         float a = 0.01 * i;
-        int profit = constructive_greedy_randomized(n, Q, v, a, s);
+        pair<int, int> r = constructive_greedy_randomized(n, Q, v, 1.0, a, s);
 
-        cout << "[a = " << fixed << setprecision(2) << a << "]: " << profit << " - solution: ( ";
-        for (auto x : s) {
+        cout << "[a = " << fixed << setprecision(2) << a << "]: "
+             << "profit: " << r.first << ", weight: " << r.second << ", " 
+             << "solution: ( ";
+        
+        for (auto x : s)
             cout << x << " ";
-        }
+
         cout << ");" << endl;
 
         s.clear();
