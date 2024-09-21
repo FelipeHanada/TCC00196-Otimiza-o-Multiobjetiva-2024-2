@@ -10,21 +10,21 @@ template <typename T>
 class Movement {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
 public:
-    virtual T move(T s) = 0;
+    virtual T move(const T &s) = 0;
 };
 
 template <typename T>
 class MovementGenerator {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
 public:
-    virtual std::vector<Movement<T>*> generate(T s) = 0;
+    virtual std::vector<Movement<T>*> generate(T &s) = 0;
 };
 
-template <typename T>
+template <typename T, typename S>
 class Evaluator {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
 public:
-    virtual int evaluate(T s) = 0;
+    virtual S evaluate(T &s) = 0;
 };
 
 #endif // OPTIMIZATION_H
