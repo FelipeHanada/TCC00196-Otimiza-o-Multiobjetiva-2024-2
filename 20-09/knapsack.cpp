@@ -70,6 +70,64 @@ std::vector<Movement<KnapsackSolution>*> Knapsack1FlipBitMovementGenerator::gene
     return movements;
 }
 
+KnapsackIntervalFlipBitMovement::KnapsackIntervalFlipBitMovement(int i, int j) {
+    this->i = i;
+    this->j = j;
+}
+
+KnapsackSolution KnapsackIntervalFlipBitMovement::move(const KnapsackSolution &s) {
+    KnapsackSolution s1(s);
+    for (int k = this->i; k <= this->j; k++)
+        s1.flip(k);
+    return s1;
+}
+
+KnapsackIntervalFlipBitMovementGenerator::KnapsackIntervalFlipBitMovementGenerator(int n)
+    : MovementGenerator<KnapsackSolution>()
+{
+    this->n = n;
+}
+
+std::vector<Movement<KnapsackSolution>*> KnapsackIntervalFlipBitMovementGenerator::generate(const KnapsackSolution &s) {
+    std::vector<Movement<KnapsackSolution>*> movements;
+    for (int i = 0; i < this->n; i++) {
+        for (int j = i; j < this->n; j++) {
+            movements.push_back(new KnapsackIntervalFlipBitMovement(i, j));
+        }
+    }
+    return movements;
+}
+
+KnapsackInversionMovement::KnapsackInversionMovement(int i, int j) {
+    this->i = i;
+    this->j = j;
+}
+
+KnapsackSolution KnapsackInversionMovement::move(const KnapsackSolution &s) {
+    KnapsackSolution s1(s);
+    for (int k = 0; k < (this->j - this->i + 1) / 2; k++) {
+        s1.flip(this->i + k);
+        s1.flip(this->j - k);
+    }
+    return s1;
+}
+
+KnapsackInversionMovementGenerator::KnapsackInversionMovementGenerator(int n)
+    : MovementGenerator<KnapsackSolution>()
+{
+    this->n = n;
+}
+
+std::vector<Movement<KnapsackSolution>*> KnapsackInversionMovementGenerator::generate(const KnapsackSolution &s) {
+    std::vector<Movement<KnapsackSolution>*> movements;
+    for (int i = 0; i < this->n; i++) {
+        for (int j = i; j < this->n; j++) {
+            movements.push_back(new KnapsackInversionMovement(i, j));
+        }
+    }
+    return movements;
+}
+
 KnapsackSolution cm_knapsack_greedy_randomized(KnapsackEvaluator evl, float t, float a) {
     auto start = std::chrono::high_resolution_clock::now();
 
