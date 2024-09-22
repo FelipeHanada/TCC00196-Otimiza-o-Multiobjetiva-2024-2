@@ -8,21 +8,18 @@ Local Search: Hill Climbing (1 Flip Bit)
 Local Search: Random Descent (1 Flip Bit)
 7
 0 1 3 
-
 Local Search: Hill Climbing (Interval Flip Bit)
 7
 0 1 3 
 Local Search: Random Descent (Interval Flip Bit)
 7
 0 1 3 
-
 Local Search: Hill Climbing (Interval Inversion)
 7
 0 1 3 
 Local Search: Random Descent (Interval Inversion)
 7
 0 1 3 
-
 [ ---------- TEST 1 ---------- ]
 Constructive Method: Greedy Randomized
 450
@@ -33,18 +30,15 @@ Local Search: Hill Climbing (1 Flip Bit)
 Local Search: Random Descent (1 Flip Bit)
 450
 0 5 9 10 16 18 21 27 29 36 45 
-
 Local Search: Hill Climbing (Interval Flip Bit)
 453
 0 5 11 17 21 27 29 36 45 
 Local Search: Random Descent (Interval Flip Bit)
 450
 0 5 9 10 16 18 21 27 29 36 45 
-
 Local Search: Hill Climbing (Interval Inversion)
 450
 0 5 9 10 16 18 21 27 29 36 45 
 Local Search: Random Descent (Interval Inversion)
 450
 0 5 9 10 16 18 21 27 29 36 45 
-

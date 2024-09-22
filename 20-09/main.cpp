@@ -63,7 +63,7 @@ int main() {
                 if (s2.get(i))
                     std::cout << i << " ";
             }
-            std::cout << std::endl << std::endl;
+            std::cout << std::endl;
         }
     }
 }
