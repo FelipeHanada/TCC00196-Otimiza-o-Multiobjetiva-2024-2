@@ -11,10 +11,11 @@
 
 class KnapsackSolution : public Solution {
 public:
+    int n;
     bool *s; 
     KnapsackSolution(int n);
     KnapsackSolution(const KnapsackSolution &s);
-    bool get(int i);
+    bool get(int i) const;
     void set(int i, bool x);
     void flip(int i);
 };
@@ -30,7 +31,7 @@ class Knapsack1FlipBitMovementGenerator : public MovementGenerator<KnapsackSolut
     int n;
 public:
     Knapsack1FlipBitMovementGenerator(int n);
-    std::vector<Movement<KnapsackSolution>*> generate(KnapsackSolution &s) override;
+    std::vector<Movement<KnapsackSolution>*> generate(const KnapsackSolution &s) override;
 };
 
 class KnapsackEvaluator : public Evaluator<KnapsackSolution, long long> {
@@ -40,7 +41,7 @@ public:
     std::vector<int> v;  // item values
     std::vector<int> w;  // item weights
     KnapsackEvaluator(int n, long long q, std::vector<int> v, std::vector<int> w);
-    long long evaluate(KnapsackSolution &s) override;
+    long long evaluate(const KnapsackSolution &s) override;
 };
 
 KnapsackSolution cm_knapsack_greedy_randomized(KnapsackEvaluator evl, float t, float a);

@@ -11,10 +11,10 @@ NEFindAny<T, S>::NEFindAny(Evaluator<T, S> &evl, MovementGenerator<T> &mg, int k
     : NeighborhoodExplorationMethod<T, S>(evl, mg), k(k) {}
 
 template <typename T, typename S>
-T NEFindAny<T, S>::run(T &s) {
+T NEFindAny<T, S>::run(const T &s) {
     std::vector<Movement<T>*> movements = this->mg.generate(s);
 
-    T curr = s;
+    T curr(s);
     int curr_value = this->evl.evaluate(s);
     for (int i = 0; i < this->k && movements.size() > 0; i++) {
         int m = rand() % movements.size();
@@ -38,7 +38,7 @@ NEFindFirst<T, S>::NEFindFirst(Evaluator<T, S> &evl, MovementGenerator<T> &mg)
     : NeighborhoodExplorationMethod<T, S>(evl, mg) {}
 
 template <typename T, typename S>
-T NEFindFirst<T, S>::run(T &s) {
+T NEFindFirst<T, S>::run(const T &s) {
     std::vector<Movement<T>*> movements = this->mg.generate(s);
 
     int value = this->evl.evaluate(s);
@@ -55,7 +55,7 @@ NEFindNext<T, S>::NEFindNext(Evaluator<T, S> &evl, MovementGenerator<T> &mg, int
     : NeighborhoodExplorationMethod<T, S>(evl, mg), j(j) {}
 
 template <typename T, typename S>
-T NEFindNext<T, S>::run(T &s) {
+T NEFindNext<T, S>::run(const T &s) {
     std::vector<Movement<T>*> movements = this->mg.generate(s);
 
     int value = this->evl.evaluate(s);
@@ -72,7 +72,7 @@ NEFindBest<T, S>::NEFindBest(Evaluator<T, S> &evl, MovementGenerator<T> &mg)
     : NeighborhoodExplorationMethod<T, S>(evl, mg) {}
 
 template <typename T, typename S>
-T NEFindBest<T, S>::run(T &s) {
+T NEFindBest<T, S>::run(const T &s) {
     std::vector<Movement<T>*> movements = this->mg.generate(s);
 
     T curr(s);
@@ -108,7 +108,7 @@ LSHillClimbing<T, S>::LSHillClimbing(Evaluator<T, S> &evl, NeighborhoodExplorati
     : LocalSearch<T, S>(evl, ne) {}
 
 template <typename T, typename S>
-T LSHillClimbing<T, S>::run(T &s) {
+T LSHillClimbing<T, S>::run(const T &s) {
     T curr = s;
     int curr_value = this->evl.evaluate(s);
     while (true) {
@@ -126,7 +126,7 @@ RandomDescentMethod<T, S>::RandomDescentMethod(Evaluator<T, S> &evl, Neighborhoo
     : LocalSearch<T, S>(evl, ne), k(k) {}
 
 template <typename T, typename S>
-T RandomDescentMethod<T, S>::run(T &s) {
+T RandomDescentMethod<T, S>::run(const T &s) {
     T curr = s;
     long long curr_value = this->evl.evaluate(s);
     int curr_k = k;

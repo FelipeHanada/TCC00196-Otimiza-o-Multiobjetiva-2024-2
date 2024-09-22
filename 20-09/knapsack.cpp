@@ -1,19 +1,20 @@
 #include "knapsack.h"
 
 KnapsackSolution::KnapsackSolution(int n) {
+    this->n = n;
     this->s = new bool[n];
     for (int i = 0; i < n; i++)
         this->s[i] = false;
 }
 
 KnapsackSolution::KnapsackSolution(const KnapsackSolution &s)
-    : KnapsackSolution(sizeof(s.s))
+    : KnapsackSolution(s.n)
 {
-    for (int i = 0; i < sizeof(s.s); i++)
+    for (int i = 0; i < s.n; i++)
         this->s[i] = s.s[i];
 }
 
-bool KnapsackSolution::get(int i) {
+bool KnapsackSolution::get(int i) const {
     return s[i];
 }
 
@@ -32,7 +33,7 @@ KnapsackEvaluator::KnapsackEvaluator(int n, long long q, std::vector<int> v, std
     this->w = w;
 }
 
-long long KnapsackEvaluator::evaluate(KnapsackSolution &s) {
+long long KnapsackEvaluator::evaluate(const KnapsackSolution &s) {
     long long curr_q = this->q;
     long long curr_value = 0;
     for (int i = 0; i < this->n && curr_q > 0; i++) {
@@ -61,7 +62,7 @@ Knapsack1FlipBitMovementGenerator::Knapsack1FlipBitMovementGenerator(int n)
     this->n = n;
 }
 
-std::vector<Movement<KnapsackSolution>*> Knapsack1FlipBitMovementGenerator::generate(KnapsackSolution &s) {
+std::vector<Movement<KnapsackSolution>*> Knapsack1FlipBitMovementGenerator::generate(const KnapsackSolution &s) {
     std::vector<Movement<KnapsackSolution>*> movements;
     for (int i = 0; i < this->n; i++) {
         movements.push_back(new Knapsack1FlipBitMovement(i));
