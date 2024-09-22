@@ -43,12 +43,10 @@ int main() {
         };
 
         for (auto &mg : mgs) {
-            std::cout << "MOVEMENT: " << mg.first << std::endl;
-
             NEFindBest<KnapsackSolution, long long> find_best(evl, *mg.second);
             LSHillClimbing<KnapsackSolution, long long> hill_climbing(evl, find_best);
             KnapsackSolution s1 = hill_climbing.run(s);
-            std::cout << "Local Search: Hill Climbing" << std::endl;
+            std::cout << "Local Search: Hill Climbing (" << mg.first << ")" << std::endl;
             std::cout << evl.evaluate(s1) << std::endl;
             for (int i=0; i<n; i++) {
                 if (s1.get(i))
@@ -59,7 +57,7 @@ int main() {
             NEFindAny<KnapsackSolution, long long> find_any(evl, *mg.second, 5);
             RandomDescentMethod<KnapsackSolution, long long> random_descent(evl, find_any, 10);
             KnapsackSolution s2 = random_descent.run(s);
-            std::cout << "Local Search: Random Descent" << std::endl;
+            std::cout << "Local Search: Random Descent (" << mg.first << ")" << std::endl;
             std::cout << evl.evaluate(s2) << std::endl;
             for (int i=0; i<n; i++) {
                 if (s2.get(i))
