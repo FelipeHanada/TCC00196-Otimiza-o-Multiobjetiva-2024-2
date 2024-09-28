@@ -28,18 +28,9 @@ class Evaluator {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
     virtual long long evaluate(const T &s) = 0;
 public:
-    long long get_evaluation(T &s) {
-        if (!s.is_evaluated())
-            s.set_evaluation(this->evaluate(s));
-
-        return s.get_last_evaluation();
-    };
-    void clear_evaluation(T &s) {
-        s.set_evaluated(false);
-    }
-    void set_evaluation(T &s, long long e) {
-        s.set_evaluation(e);
-    }
+    long long get_evaluation(T &s);
+    void clear_evaluation(T &s);
+    void set_evaluation(T &s, long long e);
 };
 
 template <typename T>
@@ -55,5 +46,7 @@ class MovementGenerator {
 public:
     virtual std::vector<Movement<T>*> generate(const T &s) = 0;
 };
+
+#include "optimization.tpp"
 
 #endif // OPTIMIZATION_H
