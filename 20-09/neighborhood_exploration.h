@@ -1,117 +1,119 @@
 #ifndef NEIGHBORHOOD_EXPLORATION_H
 #define NEIGHBORHOOD_EXPLORATION_H
 
-#include "optimization.h"
 #include <vector>
 #include <optional>
+#include <algorithm>
+#include <cstdlib>
+#include <functional>
+#include "optimization.h"
 
-
-template <typename T, typename S>
+template <typename T>
 class NeighborhoodExplorationMethod {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
 public:
-    Evaluator<T, S> &evl;
+    Evaluator<T> &evl;
     MovementGenerator<T> &mg;
-    NeighborhoodExplorationMethod(Evaluator<T, S> &evl, MovementGenerator<T> &mg);
+    NeighborhoodExplorationMethod(Evaluator<T> &evl, MovementGenerator<T> &mg);
     virtual std::optional<std::reference_wrapper<Movement<T>>> get_movement(const T &s) = 0;
 };
 
-template <typename T, typename S>
-class NEFindAny : public NeighborhoodExplorationMethod<T, S> {
+template <typename T>
+class NEFindAny : public NeighborhoodExplorationMethod<T> {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
     int k;
 public:
-    NEFindAny(Evaluator<T, S> &evl, MovementGenerator<T> &mg, int k);
+    NEFindAny(Evaluator<T> &evl, MovementGenerator<T> &mg, int k);
     std::optional<std::reference_wrapper<Movement<T>>> get_movement(const T &s) override;
 };
 
-template <typename T, typename S>
-class NEFindFirst : public NeighborhoodExplorationMethod<T, S> {
+template <typename T>
+class NEFindFirst : public NeighborhoodExplorationMethod<T> {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
 public:
-    NEFindFirst(Evaluator<T, S> &evl, MovementGenerator<T> &mg);
+    NEFindFirst(Evaluator<T> &evl, MovementGenerator<T> &mg);
     std::optional<std::reference_wrapper<Movement<T>>> get_movement(const T &s) override;
 };
 
-template <typename T, typename S>
-class NEFindNext : public NeighborhoodExplorationMethod<T, S> {
+template <typename T>
+class NEFindNext : public NeighborhoodExplorationMethod<T> {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
     int j;
 public:
-    NEFindNext(Evaluator<T, S> &evl, MovementGenerator<T> &mg, int j);
+    NEFindNext(Evaluator<T> &evl, MovementGenerator<T> &mg, int j);
     std::optional<std::reference_wrapper<Movement<T>>> get_movement(const T &s) override;
 };
 
-template <typename T, typename S>
-class NEFindBest : public NeighborhoodExplorationMethod<T, S> {
+template <typename T>
+class NEFindBest : public NeighborhoodExplorationMethod<T> {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
 public:
-    NEFindBest(Evaluator<T, S> &evl, MovementGenerator<T> &mg);
+    NEFindBest(Evaluator<T> &evl, MovementGenerator<T> &mg);
     std::optional<std::reference_wrapper<Movement<T>>> get_movement(const T &s) override;
 };
 
 template <typename T>
 std::vector<T> all_neighbors(T &s, MovementGenerator<T> &mg);
 
-template <typename T, typename S>
+template <typename T>
 class RefinementHeuristicsMethod {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
 public:
-    Evaluator<T, S> &evl;
+    Evaluator<T> &evl;
     MovementGenerator<T> &mg;
-    RefinementHeuristicsMethod(Evaluator<T, S> &evl, MovementGenerator<T> &mg);
+    RefinementHeuristicsMethod(Evaluator<T> &evl, MovementGenerator<T> &mg);
     virtual std::optional<T> run(const T &s) = 0;
 };
 
-template <typename T, typename S>
-class RHRandomSelection : public RefinementHeuristicsMethod<T, S> {
+template <typename T>
+class RHRandomSelection : public RefinementHeuristicsMethod<T> {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
     int k;
 public:
-    RHRandomSelection(Evaluator<T, S> &evl, MovementGenerator<T> &mg, int k);
+    RHRandomSelection(Evaluator<T> &evl, MovementGenerator<T> &mg, int k);
     std::optional<T> run(const T &s) override;
 };
 
-template <typename T, typename S>
-class RHFirstImprovement : public RefinementHeuristicsMethod<T, S> {
+template <typename T>
+class RHFirstImprovement : public RefinementHeuristicsMethod<T> {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
 public:
-    RHFirstImprovement(Evaluator<T, S> &evl, MovementGenerator<T> &mg);
+    RHFirstImprovement(Evaluator<T> &evl, MovementGenerator<T> &mg);
     std::optional<T> run(const T &s) override;
 };
 
-template <typename T, typename S>
-class RHBestImprovement : public RefinementHeuristicsMethod<T, S> {
+template <typename T>
+class RHBestImprovement : public RefinementHeuristicsMethod<T> {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
 public:
-    RHBestImprovement(Evaluator<T, S> &evl, MovementGenerator<T> &mg);
+    RHBestImprovement(Evaluator<T> &evl, MovementGenerator<T> &mg);
     std::optional<T> run(const T &s) override;
 };
 
-template <typename T, typename S>
+template <typename T>
 class LocalSearch {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
 public:
-    Evaluator<T, S> &evl;
-    RefinementHeuristicsMethod<T, S> &rh;
-    LocalSearch(Evaluator<T, S> &evl, RefinementHeuristicsMethod<T, S> &rh);
+    Evaluator<T> &evl;
+    RefinementHeuristicsMethod<T> &rh;
+    LocalSearch(Evaluator<T> &evl, RefinementHeuristicsMethod<T> &rh);
     virtual T run(const T &s) = 0;
 };
 
-template <typename T, typename S>
-class LSHillClimbing : public LocalSearch<T, S> {
+template <typename T>
+class LSHillClimbing : public LocalSearch<T> {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
 public:
-    LSHillClimbing(Evaluator<T, S> &evl, RefinementHeuristicsMethod<T, S> &rh);
+    LSHillClimbing(Evaluator<T> &evl, RefinementHeuristicsMethod<T> &rh);
     T run(const T &s) override;
 };
 
-template <typename T, typename S>
-class RandomDescentMethod : public LocalSearch<T, S> {
+template <typename T>
+class RandomDescentMethod : public LocalSearch<T> {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
     int k;
 public:
-    RandomDescentMethod(Evaluator<T, S> &evl, RefinementHeuristicsMethod<T, S> &rh, int k);
+    RandomDescentMethod(Evaluator<T> &evl, RefinementHeuristicsMethod<T> &rh, int k);
     T run(const T &s) override;
 };
 

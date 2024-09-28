@@ -2,15 +2,26 @@
 #define OPTIMIZATION_H
 
 #include <vector>
+#include <map>
+#include <optional>
 #include <type_traits>
 
-class Solution {};
+class Solution {
+    bool evaluated;
+    long long evaluation;
+public:
+    Solution();
+    bool is_evaluated() const;
+    void set_evaluated(bool e);
+    long long get_evaluation();
+    void set_evaluation(long long e);
+};
 
-template <typename T, typename S>
+template <typename T>
 class Evaluator {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
 public:
-    virtual S evaluate(const T &s) = 0;
+    virtual long long evaluate(const T &s) = 0;
 };
 
 template <typename T>

@@ -1,6 +1,9 @@
 #include "knapsack.h"
 
-KnapsackSolution::KnapsackSolution(int n) {
+
+KnapsackSolution::KnapsackSolution(int n)
+    : Solution()
+{
     this->n = n;
     this->s = new bool[n];
     for (int i = 0; i < n; i++)
@@ -46,7 +49,13 @@ long long KnapsackEvaluator::evaluate(const KnapsackSolution &s) {
     return curr_value;
 }
 
-Knapsack1FlipBitMovement::Knapsack1FlipBitMovement(int i) {
+KnapsackMovement::KnapsackMovement(KnapsackEvaluator &evl) : evl(evl) {}
+
+KnapsackMovementGenerator::KnapsackMovementGenerator(KnapsackEvaluator &evl) : evl(evl) {}
+
+Knapsack1FlipBitMovement::Knapsack1FlipBitMovement(KnapsackEvaluator &evl, int i)
+    : KnapsackMovement(evl)
+{
     this->i = i;
 }
 
@@ -56,8 +65,8 @@ KnapsackSolution Knapsack1FlipBitMovement::move(const KnapsackSolution &s) {
     return s1;
 }
 
-Knapsack1FlipBitMovementGenerator::Knapsack1FlipBitMovementGenerator(int n)
-    : MovementGenerator<KnapsackSolution>()
+Knapsack1FlipBitMovementGenerator::Knapsack1FlipBitMovementGenerator(KnapsackEvaluator &evl, int n)
+    : KnapsackMovementGenerator(evl)
 {
     this->n = n;
 }
@@ -65,12 +74,14 @@ Knapsack1FlipBitMovementGenerator::Knapsack1FlipBitMovementGenerator(int n)
 std::vector<Movement<KnapsackSolution>*> Knapsack1FlipBitMovementGenerator::generate(const KnapsackSolution &s) {
     std::vector<Movement<KnapsackSolution>*> movements;
     for (int i = 0; i < this->n; i++) {
-        movements.push_back(new Knapsack1FlipBitMovement(i));
+        movements.push_back(new Knapsack1FlipBitMovement(this->evl, i));
     }
     return movements;
 }
 
-KnapsackIntervalFlipBitMovement::KnapsackIntervalFlipBitMovement(int i, int j) {
+KnapsackIntervalFlipBitMovement::KnapsackIntervalFlipBitMovement(KnapsackEvaluator &evl, int i, int j)
+    : KnapsackMovement(evl)
+{
     this->i = i;
     this->j = j;
 }
@@ -82,8 +93,8 @@ KnapsackSolution KnapsackIntervalFlipBitMovement::move(const KnapsackSolution &s
     return s1;
 }
 
-KnapsackIntervalFlipBitMovementGenerator::KnapsackIntervalFlipBitMovementGenerator(int n)
-    : MovementGenerator<KnapsackSolution>()
+KnapsackIntervalFlipBitMovementGenerator::KnapsackIntervalFlipBitMovementGenerator(KnapsackEvaluator &evl, int n)
+    : KnapsackMovementGenerator(evl)
 {
     this->n = n;
 }
@@ -92,13 +103,15 @@ std::vector<Movement<KnapsackSolution>*> KnapsackIntervalFlipBitMovementGenerato
     std::vector<Movement<KnapsackSolution>*> movements;
     for (int i = 0; i < this->n; i++) {
         for (int j = i; j < this->n; j++) {
-            movements.push_back(new KnapsackIntervalFlipBitMovement(i, j));
+            movements.push_back(new KnapsackIntervalFlipBitMovement(this->evl, i, j));
         }
     }
     return movements;
 }
 
-KnapsackInversionMovement::KnapsackInversionMovement(int i, int j) {
+KnapsackInversionMovement::KnapsackInversionMovement(KnapsackEvaluator &evl, int i, int j)
+    : KnapsackMovement(evl)
+{
     this->i = i;
     this->j = j;
 }
@@ -112,8 +125,8 @@ KnapsackSolution KnapsackInversionMovement::move(const KnapsackSolution &s) {
     return s1;
 }
 
-KnapsackInversionMovementGenerator::KnapsackInversionMovementGenerator(int n)
-    : MovementGenerator<KnapsackSolution>()
+KnapsackInversionMovementGenerator::KnapsackInversionMovementGenerator(KnapsackEvaluator &evl, int n)
+    : KnapsackMovementGenerator(evl)
 {
     this->n = n;
 }
@@ -122,13 +135,13 @@ std::vector<Movement<KnapsackSolution>*> KnapsackInversionMovementGenerator::gen
     std::vector<Movement<KnapsackSolution>*> movements;
     for (int i = 0; i < this->n; i++) {
         for (int j = i; j < this->n; j++) {
-            movements.push_back(new KnapsackInversionMovement(i, j));
+            movements.push_back(new KnapsackInversionMovement(evl, i, j));
         }
     }
     return movements;
 }
 
-KnapsackSolution cm_knapsack_greedy_randomized(KnapsackEvaluator evl, float t, float a) {
+KnapsackSolution cm_knapsack_greedy_randomized(const KnapsackEvaluator &evl, float t, float a) {
     auto start = std::chrono::high_resolution_clock::now();
 
     KnapsackSolution s(evl.n);

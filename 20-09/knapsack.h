@@ -9,10 +9,11 @@
 #include <numeric>
 #include <climits>
 
+
 class KnapsackSolution : public Solution {
 public:
     int n;
-    bool *s; 
+    bool *s;
     KnapsackSolution(int n);
     KnapsackSolution(const KnapsackSolution &s);
     bool get(int i) const;
@@ -20,7 +21,7 @@ public:
     void flip(int i);
 };
 
-class KnapsackEvaluator : public Evaluator<KnapsackSolution, long long> {
+class KnapsackEvaluator : public Evaluator<KnapsackSolution> {
 public:
     int n;  // item quantity
     long long q;  // capacity
@@ -30,48 +31,60 @@ public:
     long long evaluate(const KnapsackSolution &s) override;
 };
 
-class Knapsack1FlipBitMovement : public Movement<KnapsackSolution> {
+class KnapsackMovement : public Movement<KnapsackSolution> {
+public:
+    KnapsackEvaluator &evl;
+    KnapsackMovement(KnapsackEvaluator &evl);
+};
+
+class Knapsack1FlipBitMovement : public KnapsackMovement {
     int i;
 public:
-    Knapsack1FlipBitMovement(int i);
+    Knapsack1FlipBitMovement(KnapsackEvaluator &evl, int i);
     KnapsackSolution move(const KnapsackSolution &s) override;
 };
 
-class Knapsack1FlipBitMovementGenerator : public MovementGenerator<KnapsackSolution> {
-    int n;
-public:
-    Knapsack1FlipBitMovementGenerator(int n);
-    std::vector<Movement<KnapsackSolution>*> generate(const KnapsackSolution &s) override;
-};
-
-class KnapsackIntervalFlipBitMovement : public Movement<KnapsackSolution> {
+class KnapsackIntervalFlipBitMovement : public KnapsackMovement {
     int i, j;
 public:
-    KnapsackIntervalFlipBitMovement(int i, int j);
+    KnapsackIntervalFlipBitMovement(KnapsackEvaluator &evl, int i, int j);
     KnapsackSolution move(const KnapsackSolution &s) override;
 };
 
-class KnapsackIntervalFlipBitMovementGenerator : public MovementGenerator<KnapsackSolution> {
-    int n;
-public:
-    KnapsackIntervalFlipBitMovementGenerator(int n);
-    std::vector<Movement<KnapsackSolution>*> generate(const KnapsackSolution &s) override;
-};
-
-class KnapsackInversionMovement : public Movement<KnapsackSolution> {
+class KnapsackInversionMovement : public KnapsackMovement {
     int i, j;
 public:
-    KnapsackInversionMovement(int i, int j);
+    KnapsackInversionMovement(KnapsackEvaluator &evl, int i, int j);
     KnapsackSolution move(const KnapsackSolution &s) override;
 };
 
-class KnapsackInversionMovementGenerator : public MovementGenerator<KnapsackSolution> {
+class KnapsackMovementGenerator : public MovementGenerator<KnapsackSolution> {
+public:
+    KnapsackEvaluator &evl;
+    KnapsackMovementGenerator(KnapsackEvaluator &evl);
+};
+
+class Knapsack1FlipBitMovementGenerator : public KnapsackMovementGenerator {
     int n;
 public:
-    KnapsackInversionMovementGenerator(int n);
+    Knapsack1FlipBitMovementGenerator(KnapsackEvaluator &evl, int n);
     std::vector<Movement<KnapsackSolution>*> generate(const KnapsackSolution &s) override;
 };
 
-KnapsackSolution cm_knapsack_greedy_randomized(KnapsackEvaluator evl, float t, float a);
+class KnapsackIntervalFlipBitMovementGenerator : public KnapsackMovementGenerator {
+    int n;
+public:
+    KnapsackIntervalFlipBitMovementGenerator(KnapsackEvaluator &evl, int n);
+    std::vector<Movement<KnapsackSolution>*> generate(const KnapsackSolution &s) override;
+};
+
+class KnapsackInversionMovementGenerator : public KnapsackMovementGenerator {
+    int n;
+public:
+    KnapsackInversionMovementGenerator(KnapsackEvaluator &evl, int n);
+    std::vector<Movement<KnapsackSolution>*> generate(const KnapsackSolution &s) override;
+};
+
+KnapsackSolution cm_knapsack_greedy_randomized(const KnapsackEvaluator &evl, float t, float a);
 
 #endif // KNAPSACK_H

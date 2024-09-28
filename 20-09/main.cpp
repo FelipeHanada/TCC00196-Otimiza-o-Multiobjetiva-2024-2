@@ -4,7 +4,6 @@
 #include "knapsack.h"
 #include "neighborhood_exploration.h"
 
-
 int main() {
     freopen("knapsack-input.txt", "r", stdin);
     freopen("knapsack-output.txt", "w", stdout);
@@ -37,14 +36,14 @@ int main() {
         std::cout << std::endl;
 
         std::vector<std::pair<std::string, MovementGenerator<KnapsackSolution>*>> mgs = {
-            std::make_pair("1 Flip Bit", new Knapsack1FlipBitMovementGenerator(n)),
-            std::make_pair("Interval Flip Bit", new KnapsackIntervalFlipBitMovementGenerator(n)),
-            std::make_pair("Interval Inversion", new KnapsackInversionMovementGenerator(n))
+            std::make_pair("1 Flip Bit", new Knapsack1FlipBitMovementGenerator(evl, n)),
+            std::make_pair("Interval Flip Bit", new KnapsackIntervalFlipBitMovementGenerator(evl, n)),
+            std::make_pair("Interval Inversion", new KnapsackInversionMovementGenerator(evl, n))
         };
 
         for (auto &mg : mgs) {
-            RHFirstImprovement<KnapsackSolution, long long> fi(evl, *mg.second);
-            LSHillClimbing<KnapsackSolution, long long> hill_climbing_fi(evl, fi);
+            RHFirstImprovement<KnapsackSolution> fi(evl, *mg.second);
+            LSHillClimbing<KnapsackSolution> hill_climbing_fi(evl, fi);
             KnapsackSolution s1 = hill_climbing_fi.run(s);
             std::cout << "Local Search: Hill Climbing - First Improvement (" << mg.first << ")" << std::endl;
             std::cout << evl.evaluate(s1) << std::endl;
@@ -54,8 +53,8 @@ int main() {
             }
             std::cout << std::endl;
 
-            RHBestImprovement<KnapsackSolution, long long> bi(evl, *mg.second);
-            LSHillClimbing<KnapsackSolution, long long> hill_climbing_bi(evl, bi);
+            RHBestImprovement<KnapsackSolution> bi(evl, *mg.second);
+            LSHillClimbing<KnapsackSolution> hill_climbing_bi(evl, bi);
             KnapsackSolution s2 = hill_climbing_bi.run(s);
             std::cout << "Local Search: Hill Climbing - Best Improvement (" << mg.first << ")" << std::endl;
             std::cout << evl.evaluate(s2) << std::endl;
@@ -65,8 +64,8 @@ int main() {
             }
             std::cout << std::endl;
 
-            RHRandomSelection<KnapsackSolution, long long> rs(evl, *mg.second, 5);
-            RandomDescentMethod<KnapsackSolution, long long> random_descent(evl, rs, 10);
+            RHRandomSelection<KnapsackSolution> rs(evl, *mg.second, 5);
+            RandomDescentMethod<KnapsackSolution> random_descent(evl, rs, 10);
             KnapsackSolution s3 = random_descent.run(s);
             std::cout << "Local Search: Random Descent - Random Selection (" << mg.first << ")" << std::endl;
             std::cout << evl.evaluate(s3) << std::endl;
