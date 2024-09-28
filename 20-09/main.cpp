@@ -43,10 +43,10 @@ int main() {
         };
 
         for (auto &mg : mgs) {
-            NEFindBest<KnapsackSolution, long long> find_best(evl, *mg.second);
-            LSHillClimbing<KnapsackSolution, long long> hill_climbing(evl, find_best);
-            KnapsackSolution s1 = hill_climbing.run(s);
-            std::cout << "Local Search: Hill Climbing (" << mg.first << ")" << std::endl;
+            RHFirstImprovement<KnapsackSolution, long long> fi(evl, *mg.second);
+            LSHillClimbing<KnapsackSolution, long long> hill_climbing_fi(evl, fi);
+            KnapsackSolution s1 = hill_climbing_fi.run(s);
+            std::cout << "Local Search: Hill Climbing - First Improvement (" << mg.first << ")" << std::endl;
             std::cout << evl.evaluate(s1) << std::endl;
             for (int i=0; i<n; i++) {
                 if (s1.get(i))
@@ -54,13 +54,24 @@ int main() {
             }
             std::cout << std::endl;
 
-            NEFindAny<KnapsackSolution, long long> find_any(evl, *mg.second, 5);
-            RandomDescentMethod<KnapsackSolution, long long> random_descent(evl, find_any, 10);
-            KnapsackSolution s2 = random_descent.run(s);
-            std::cout << "Local Search: Random Descent (" << mg.first << ")" << std::endl;
+            RHBestImprovement<KnapsackSolution, long long> bi(evl, *mg.second);
+            LSHillClimbing<KnapsackSolution, long long> hill_climbing_bi(evl, bi);
+            KnapsackSolution s2 = hill_climbing_bi.run(s);
+            std::cout << "Local Search: Hill Climbing - Best Improvement (" << mg.first << ")" << std::endl;
             std::cout << evl.evaluate(s2) << std::endl;
             for (int i=0; i<n; i++) {
                 if (s2.get(i))
+                    std::cout << i << " ";
+            }
+            std::cout << std::endl;
+
+            RHRandomSelection<KnapsackSolution, long long> rs(evl, *mg.second, 5);
+            RandomDescentMethod<KnapsackSolution, long long> random_descent(evl, rs, 10);
+            KnapsackSolution s3 = random_descent.run(s);
+            std::cout << "Local Search: Random Descent - Random Selection (" << mg.first << ")" << std::endl;
+            std::cout << evl.evaluate(s3) << std::endl;
+            for (int i=0; i<n; i++) {
+                if (s3.get(i))
                     std::cout << i << " ";
             }
             std::cout << std::endl;
