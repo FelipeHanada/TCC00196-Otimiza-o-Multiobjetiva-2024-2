@@ -85,8 +85,10 @@ public:
     std::vector<Movement<KnapsackSolution>*> generate(const KnapsackSolution &s) override;
 };
 
-KnapsackSolution cm_knapsack_greedy_randomized(const KnapsackEvaluator &evl, float t, float a);
+KnapsackSolution cm_knapsack_greedy(const KnapsackEvaluator &evl);
 
-KnapsackSolution cm_knapsack_randomized(const KnapsackEvaluator &evl, float t);
+KnapsackSolution cm_knapsack_random(const KnapsackEvaluator &evl, float t);
+
+KnapsackSolution cm_knapsack_greedy_randomized(const KnapsackEvaluator &evl, float t, float a);
 
 #endif // KNAPSACK_H

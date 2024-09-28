@@ -155,6 +155,64 @@ std::vector<Movement<KnapsackSolution>*> KnapsackInversionMovementGenerator::gen
     return movements;
 }
 
+KnapsackSolution cm_knapsack_greedy(const KnapsackEvaluator &evl) {
+    long long curr_Q = evl.q;
+    KnapsackSolution s(evl.n);
+
+    std::vector<int> c(evl.n);
+    std::iota(c.begin(), c.end(), 0);
+    std::sort(c.begin(), c.end(), [&](const int x, const int y) {
+        float qx = evl.v[x] / (float) evl.w[x],
+              qy = evl.v[y] / (float) evl.w[y];
+        return qx > qy;
+    });
+
+    for (int g : c) {
+        if (evl.w[g] > curr_Q) {
+            continue;
+        }
+
+        curr_Q -= evl.w[g];
+        s.set(g, true);
+    }
+
+    return s;
+}
+
+KnapsackSolution cm_knapsack_random(const KnapsackEvaluator &evl, float t) {
+    auto start = std::chrono::high_resolution_clock::now();
+
+    long long curr_Q = evl.q;
+    KnapsackSolution s(evl.n);
+
+    std::vector<int> c(evl.n);
+    iota(c.begin(), c.end(), 0);
+    sort(c.begin(), c.end(), [&](const int x, const int y) {
+        return evl.w[x] < evl.w[y];
+    });
+
+    while (c.size() > 0 && curr_Q < evl.w[(*c.rbegin())]) {
+        c.pop_back();
+    }
+
+    while (c.size() > 0 && curr_Q >= evl.w[c[0]]) {
+        auto current = std::chrono::high_resolution_clock::now();
+        if (std::chrono::duration<float>(current - start).count() > t)
+            break;
+
+        auto g = c.begin() + (rand() % c.size());
+        s.set(*g, true);
+        curr_Q -= evl.w[*g];
+        c.erase(g);
+
+        while (c.size() > 0 && curr_Q < evl.w[(*c.rbegin())]) {
+           c.pop_back();
+        }
+    }
+
+    return s;
+}
+
 KnapsackSolution cm_knapsack_greedy_randomized(const KnapsackEvaluator &evl, float t, float a) {
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -220,40 +278,6 @@ KnapsackSolution cm_knapsack_greedy_randomized(const KnapsackEvaluator &evl, flo
                 c_value_ordered.end()
             );
             c.erase(c.begin());
-        }
-    }
-
-    return s;
-}
-
-KnapsackSolution cm_knapsack_randomized(const KnapsackEvaluator &evl, float t) {
-    auto start = std::chrono::high_resolution_clock::now();
-
-    int curr_Q = evl.q;
-    KnapsackSolution s(evl.n);
-
-    std::vector<int> c(evl.n);
-    iota(c.begin(), c.end(), 0);
-    sort(c.begin(), c.end(), [&](const int x, const int y) {
-        return evl.w[x] < evl.w[y];
-    });
-
-    while (c.size() > 0 && curr_Q < evl.w[(*c.rbegin())]) {
-        c.pop_back();
-    }
-
-    while (c.size() > 0 && curr_Q >= evl.w[c[0]]) {
-        auto current = std::chrono::high_resolution_clock::now();
-        if (std::chrono::duration<float>(current - start).count() > t)
-            break;
-
-        auto g = c.begin() + (rand() % c.size());
-        s.set(*g, true);
-        curr_Q -= evl.w[*g];
-        c.erase(g);
-
-        while (c.size() > 0 && curr_Q < evl.w[(*c.rbegin())]) {
-           c.pop_back();
         }
     }
 
