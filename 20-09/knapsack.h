@@ -37,10 +37,10 @@ public:
     KnapsackMovement(KnapsackEvaluator &evl);
 };
 
-class Knapsack1FlipBitMovement : public KnapsackMovement {
-    int i;
+class Knapsack2FlipBitMovement : public KnapsackMovement {
+    int i, j;
 public:
-    Knapsack1FlipBitMovement(KnapsackEvaluator &evl, int i);
+    Knapsack2FlipBitMovement(KnapsackEvaluator &evl, int i, int j);
     KnapsackSolution move(const KnapsackSolution &s) override;
 };
 
@@ -64,10 +64,10 @@ public:
     KnapsackMovementGenerator(KnapsackEvaluator &evl);
 };
 
-class Knapsack1FlipBitMovementGenerator : public KnapsackMovementGenerator {
+class Knapsack2FlipBitMovementGenerator : public KnapsackMovementGenerator {
     int n;
 public:
-    Knapsack1FlipBitMovementGenerator(KnapsackEvaluator &evl, int n);
+    Knapsack2FlipBitMovementGenerator(KnapsackEvaluator &evl, int n);
     std::vector<Movement<KnapsackSolution>*> generate(const KnapsackSolution &s) override;
 };
 
@@ -86,5 +86,7 @@ public:
 };
 
 KnapsackSolution cm_knapsack_greedy_randomized(const KnapsackEvaluator &evl, float t, float a);
+
+KnapsackSolution cm_knapsack_randomized(const KnapsackEvaluator &evl, float t);
 
 #endif // KNAPSACK_H

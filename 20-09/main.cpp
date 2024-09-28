@@ -26,7 +26,7 @@ int main() {
         }
 
         KnapsackEvaluator evl(n, q, v, w);
-        KnapsackSolution s = cm_knapsack_greedy_randomized(evl, 999999999, 0.1);
+        KnapsackSolution s = cm_knapsack_greedy_randomized(evl, 10, 0.1);
         std::cout << "Constructive Method: Greedy Randomized" << std::endl;
         std::cout << evl.evaluate(s) << std::endl;
         for (int i=0; i<n; i++) {
@@ -36,7 +36,7 @@ int main() {
         std::cout << std::endl;
 
         std::vector<std::pair<std::string, MovementGenerator<KnapsackSolution>*>> mgs = {
-            std::make_pair("1 Flip Bit", new Knapsack1FlipBitMovementGenerator(evl, n)),
+            std::make_pair("2 Flip Bit", new Knapsack2FlipBitMovementGenerator(evl, n)),
             std::make_pair("Interval Flip Bit", new KnapsackIntervalFlipBitMovementGenerator(evl, n)),
             std::make_pair("Interval Inversion", new KnapsackInversionMovementGenerator(evl, n))
         };
