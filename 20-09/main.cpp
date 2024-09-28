@@ -5,6 +5,16 @@
 #include "knapsack.h"
 #include "neighborhood_exploration.h"
 
+void print_solution(std::string label, KnapsackSolution &s) {
+    std::cout << label << std::endl;
+    std::cout << "Evaluation: " << s.get_evaluation() << " / ";
+    for (int i=0; i<s.n; i++) {
+        if (s.get(i))
+            std::cout << i << " ";
+    }
+    std::cout << std::endl;
+}
+
 int main() {
     freopen("knapsack-input.txt", "r", stdin);
     freopen("knapsack-output.txt", "w", stdout);
@@ -42,46 +52,26 @@ int main() {
 
         for (auto &cm : cms) {
             KnapsackSolution s = cm.second(evl);
-            std::cout << "Constructive Method: " << cm.first << std::endl;
-            std::cout << evl.evaluate(s) << std::endl;
-            for (int i=0; i<n; i++) {
-                if (s.get(i))
-                    std::cout << i << " ";
-            }
+            print_solution("Constructive Method: " + cm.first, s);
             std::cout << std::endl;
 
             for (auto &mg : mgs) {
                 RHFirstImprovement<KnapsackSolution> fi(evl, *mg.second);
                 LSHillClimbing<KnapsackSolution> hill_climbing_fi(evl, fi);
                 KnapsackSolution s1 = hill_climbing_fi.run(s, 10);
-                std::cout << "Local Search: " << cm.first << " + Hill Climbing + First Improvement (" << mg.first << ")" << std::endl;
-                std::cout << evl.evaluate(s1) << std::endl;
-                for (int i=0; i<n; i++) {
-                    if (s1.get(i))
-                        std::cout << i << " ";
-                }
+                print_solution("Local Search: " + cm.first + " + Hill Climbing + First Improvement (" + mg.first + ")", s1);
                 std::cout << std::endl;
 
                 RHBestImprovement<KnapsackSolution> bi(evl, *mg.second);
                 LSHillClimbing<KnapsackSolution> hill_climbing_bi(evl, bi);
                 KnapsackSolution s2 = hill_climbing_bi.run(s, 10);
-                std::cout << "Local Search: " << cm.first << " + Hill Climbing + Best Improvement (" << mg.first << ")" << std::endl;
-                std::cout << evl.evaluate(s2) << std::endl;
-                for (int i=0; i<n; i++) {
-                    if (s2.get(i))
-                        std::cout << i << " ";
-                }
+                print_solution("Local Search: " + cm.first + " + Hill Climbing + Best Improvement (" + mg.first + ")", s2);
                 std::cout << std::endl;
 
                 RHRandomSelection<KnapsackSolution> rs(evl, *mg.second, 5);
                 RandomDescentMethod<KnapsackSolution> random_descent(evl, rs, 10);
                 KnapsackSolution s3 = random_descent.run(s, 10);
-                std::cout << "Local Search: " << cm.first << " + Random Descent + Random Selection (" << mg.first << ")" << std::endl;
-                std::cout << evl.evaluate(s3) << std::endl;
-                for (int i=0; i<n; i++) {
-                    if (s3.get(i))
-                        std::cout << i << " ";
-                }
+                print_solution("Local Search: " + cm.first + " + Random Descent + Random Selection (" + mg.first + ")", s3);
                 std::cout << std::endl;
             }
 
