@@ -173,10 +173,16 @@ LSHillClimbing<T>::LSHillClimbing(Evaluator<T> &evl, RefinementHeuristicsMethod<
     : LocalSearch<T>(evl, rh) {}
 
 template <typename T>
-T LSHillClimbing<T>::run(T &s) {
+T LSHillClimbing<T>::run(T &s, float t) {
+    auto start = std::chrono::high_resolution_clock::now();
+
     T curr = s;
     long long curr_value = this->evl.get_evaluation(s);
     while (true) {
+        auto current = std::chrono::high_resolution_clock::now();
+        if (std::chrono::duration<float>(current - start).count() > t)
+            break;
+
         std::optional<T> s1 = this->rh.run(curr);
         if (!s1.has_value()) break;
         
@@ -193,11 +199,17 @@ RandomDescentMethod<T>::RandomDescentMethod(Evaluator<T> &evl, RefinementHeurist
     : LocalSearch<T>(evl, rh), k(k) {}
 
 template <typename T>
-T RandomDescentMethod<T>::run(T &s) {
+T RandomDescentMethod<T>::run(T &s, float t) {
+    auto start = std::chrono::high_resolution_clock::now();
+
     T curr = s;
     long long curr_value = this->evl.get_evaluation(s);
     int curr_k = this->k;
     while (curr_k > 0) {
+        auto current = std::chrono::high_resolution_clock::now();
+        if (std::chrono::duration<float>(current - start).count() > t)
+            break;
+
         std::optional<T> s1 = this->rh.run(curr);
         if (!s1.has_value()) break;
 

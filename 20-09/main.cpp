@@ -44,7 +44,7 @@ int main() {
         for (auto &mg : mgs) {
             RHFirstImprovement<KnapsackSolution> fi(evl, *mg.second);
             LSHillClimbing<KnapsackSolution> hill_climbing_fi(evl, fi);
-            KnapsackSolution s1 = hill_climbing_fi.run(s);
+            KnapsackSolution s1 = hill_climbing_fi.run(s, 10);
             std::cout << "Local Search: Hill Climbing - First Improvement (" << mg.first << ")" << std::endl;
             std::cout << evl.evaluate(s1) << std::endl;
             for (int i=0; i<n; i++) {
@@ -55,7 +55,7 @@ int main() {
 
             RHBestImprovement<KnapsackSolution> bi(evl, *mg.second);
             LSHillClimbing<KnapsackSolution> hill_climbing_bi(evl, bi);
-            KnapsackSolution s2 = hill_climbing_bi.run(s);
+            KnapsackSolution s2 = hill_climbing_bi.run(s, 10);
             std::cout << "Local Search: Hill Climbing - Best Improvement (" << mg.first << ")" << std::endl;
             std::cout << evl.evaluate(s2) << std::endl;
             for (int i=0; i<n; i++) {
@@ -66,7 +66,7 @@ int main() {
 
             RHRandomSelection<KnapsackSolution> rs(evl, *mg.second, 5);
             RandomDescentMethod<KnapsackSolution> random_descent(evl, rs, 10);
-            KnapsackSolution s3 = random_descent.run(s);
+            KnapsackSolution s3 = random_descent.run(s, 10);
             std::cout << "Local Search: Random Descent - Random Selection (" << mg.first << ")" << std::endl;
             std::cout << evl.evaluate(s3) << std::endl;
             for (int i=0; i<n; i++) {

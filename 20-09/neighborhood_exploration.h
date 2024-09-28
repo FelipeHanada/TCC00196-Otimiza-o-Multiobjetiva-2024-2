@@ -97,7 +97,7 @@ public:
     Evaluator<T> &evl;
     RefinementHeuristicsMethod<T> &rh;
     LocalSearch(Evaluator<T> &evl, RefinementHeuristicsMethod<T> &rh);
-    virtual T run(T &s) = 0;
+    virtual T run(T &s, float t) = 0;
 };
 
 template <typename T>
@@ -105,7 +105,7 @@ class LSHillClimbing : public LocalSearch<T> {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
 public:
     LSHillClimbing(Evaluator<T> &evl, RefinementHeuristicsMethod<T> &rh);
-    T run(T &s) override;
+    T run(T &s, float t) override;
 };
 
 template <typename T>
@@ -114,7 +114,7 @@ class RandomDescentMethod : public LocalSearch<T> {
     int k;
 public:
     RandomDescentMethod(Evaluator<T> &evl, RefinementHeuristicsMethod<T> &rh, int k);
-    T run(T &s) override;
+    T run(T &s, float t) override;
 };
 
 #include "neighborhood_exploration.tpp"
