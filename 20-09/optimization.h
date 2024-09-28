@@ -6,15 +6,21 @@
 #include <optional>
 #include <type_traits>
 
+template <typename T>
+class Evaluator;
+
 class Solution {
     bool evaluated;
-    long long evaluation;
-public:
-    Solution();
+    long long last_evaluation;
+protected:
     bool is_evaluated() const;
     void set_evaluated(bool e);
-    long long get_evaluation() const;
+    long long get_last_evaluation() const;
     void set_evaluation(long long e);
+public:
+    Solution();
+    template <typename T>
+    friend class Evaluator;
 };
 
 template <typename T>
@@ -26,8 +32,14 @@ public:
         if (!s.is_evaluated())
             s.set_evaluation(this->evaluate(s));
 
-        return s.get_evaluation();
+        return s.get_last_evaluation();
     };
+    void clear_evaluation(T &s) {
+        s.set_evaluated(false);
+    }
+    void set_evaluation(T &s, long long e) {
+        s.set_evaluation(e);
+    }
 };
 
 template <typename T>

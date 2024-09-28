@@ -5,9 +5,9 @@
 #include "knapsack.h"
 #include "neighborhood_exploration.h"
 
-void print_solution(std::string label, KnapsackSolution &s) {
+void print_solution(std::string label, KnapsackEvaluator &evl, KnapsackSolution &s) {
     std::cout << label << std::endl;
-    std::cout << "Evaluation: " << s.get_evaluation() << " / ";
+    std::cout << "Evaluation: " << evl.get_evaluation(s) << " / ";
     for (int i=0; i<s.n; i++) {
         if (s.get(i))
             std::cout << i << " ";
@@ -52,26 +52,26 @@ int main() {
 
         for (auto &cm : cms) {
             KnapsackSolution s = cm.second(evl);
-            print_solution("Constructive Method: " + cm.first, s);
+            print_solution("Constructive Method: " + cm.first, evl, s);
             std::cout << std::endl;
 
             for (auto &mg : mgs) {
                 RHFirstImprovement<KnapsackSolution> fi(evl, *mg.second);
                 LSHillClimbing<KnapsackSolution> hill_climbing_fi(evl, fi);
                 KnapsackSolution s1 = hill_climbing_fi.run(s, 10);
-                print_solution("Local Search: " + cm.first + " + Hill Climbing + First Improvement (" + mg.first + ")", s1);
+                print_solution("Local Search: " + cm.first + " + Hill Climbing + First Improvement (" + mg.first + ")", evl, s1);
                 std::cout << std::endl;
 
                 RHBestImprovement<KnapsackSolution> bi(evl, *mg.second);
                 LSHillClimbing<KnapsackSolution> hill_climbing_bi(evl, bi);
                 KnapsackSolution s2 = hill_climbing_bi.run(s, 10);
-                print_solution("Local Search: " + cm.first + " + Hill Climbing + Best Improvement (" + mg.first + ")", s2);
+                print_solution("Local Search: " + cm.first + " + Hill Climbing + Best Improvement (" + mg.first + ")", evl, s2);
                 std::cout << std::endl;
 
                 RHRandomSelection<KnapsackSolution> rs(evl, *mg.second, 5);
                 RandomDescentMethod<KnapsackSolution> random_descent(evl, rs, 10);
                 KnapsackSolution s3 = random_descent.run(s, 10);
-                print_solution("Local Search: " + cm.first + " + Random Descent + Random Selection (" + mg.first + ")", s3);
+                print_solution("Local Search: " + cm.first + " + Random Descent + Random Selection (" + mg.first + ")", evl, s3);
                 std::cout << std::endl;
             }
 
