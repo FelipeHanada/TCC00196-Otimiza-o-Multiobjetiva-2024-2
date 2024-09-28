@@ -9,17 +9,17 @@ NEFindAny<T>::NEFindAny(Evaluator<T> &evl, MovementGenerator<T> &mg, int k)
     : NeighborhoodExplorationMethod<T>(evl, mg), k(k) {}
 
 template <typename T>
-std::optional<std::reference_wrapper<Movement<T>>> NEFindAny<T>::get_movement(const T &s) {
+std::optional<std::reference_wrapper<Movement<T>>> NEFindAny<T>::get_movement(T &s) {
     std::vector<Movement<T>*> movements = this->mg.generate(s);
 
     T curr(s);
     std::optional<std::reference_wrapper<Movement<T>>> curr_m = std::nullopt;
-    int curr_value = this->evl.evaluate(s);
+    long long curr_value = this->evl.get_evaluation(s);
     for (int i = 0; i < this->k && movements.size() > 0; i++) {
         int r = std::rand() % movements.size();
         Movement<T> *m = movements[r];
         T s1 = m->move(s);
-        int s1_value = this->evl.evaluate(s1);
+        long long s1_value = this->evl.get_evaluation(s1);
         if (s1_value > curr_value) {
             curr = s1;
             curr_m = *m;
@@ -39,13 +39,13 @@ NEFindFirst<T>::NEFindFirst(Evaluator<T> &evl, MovementGenerator<T> &mg)
     : NeighborhoodExplorationMethod<T>(evl, mg) {}
 
 template <typename T>
-std::optional<std::reference_wrapper<Movement<T>>> NEFindFirst<T>::get_movement(const T &s) {
+std::optional<std::reference_wrapper<Movement<T>>> NEFindFirst<T>::get_movement(T &s) {
     std::vector<Movement<T>*> movements = this->mg.generate(s);
 
-    int value = this->evl.evaluate(s);
+    long long value = this->evl.get_evaluation(s);
     for (Movement<T> *m : movements) {
         T s1 = m->move(s);
-        int s1_value = this->evl.evaluate(s1);
+        long long s1_value = this->evl.get_evaluation(s1);
         if (s1_value > value) {
             return *m;
         }
@@ -58,14 +58,14 @@ NEFindNext<T>::NEFindNext(Evaluator<T> &evl, MovementGenerator<T> &mg, int j)
     : NeighborhoodExplorationMethod<T>(evl, mg), j(j) {}
 
 template <typename T>
-std::optional<std::reference_wrapper<Movement<T>>> NEFindNext<T>::get_movement(const T &s) {
+std::optional<std::reference_wrapper<Movement<T>>> NEFindNext<T>::get_movement(T &s) {
     std::vector<Movement<T>*> movements = this->mg.generate(s);
 
-    int value = this->evl.evaluate(s);
+    long long value = this->evl.get_evaluation(s);
     for (int i = j + 1; i < movements.size(); i++) {
         Movement<T> m = movements[i];
         T s1 = m->move(s);
-        int s1_value = this->evl.evaluate(s1);
+        long long s1_value = this->evl.get_evaluation(s1);
         if (s1_value > value) return m;
     }
     return std::nullopt;
@@ -76,15 +76,15 @@ NEFindBest<T>::NEFindBest(Evaluator<T> &evl, MovementGenerator<T> &mg)
     : NeighborhoodExplorationMethod<T>(evl, mg) {}
 
 template <typename T>
-std::optional<std::reference_wrapper<Movement<T>>> NEFindBest<T>::get_movement(const T &s) {
+std::optional<std::reference_wrapper<Movement<T>>> NEFindBest<T>::get_movement(T &s) {
     std::vector<Movement<T>*> movements = this->mg.generate(s);
 
     T curr(s);
     std::optional<std::reference_wrapper<Movement<T>>> curr_m = std::nullopt;
-    int curr_value = this->evl.evaluate(s);
+    long long curr_value = this->evl.get_evaluation(s);
     for (Movement<T> *m : movements) {
         T s1 = m->move(s);
-        int s1_value = this->evl.evaluate(s1);
+        long long s1_value = this->evl.get_evaluation(s1);
         if (s1_value > curr_value) {
             curr = s1;
             curr_m = *m;
@@ -115,7 +115,7 @@ RHRandomSelection<T>::RHRandomSelection(Evaluator<T> &evl, MovementGenerator<T> 
     : RefinementHeuristicsMethod<T>(evl, mg), k(k) {}
 
 template <typename T>
-std::optional<T> RHRandomSelection<T>::run(const T &s) {
+std::optional<T> RHRandomSelection<T>::run(T &s) {
     NEFindAny<T> ne(this->evl, this->mg, this->k);
     std::optional<std::reference_wrapper<Movement<T>>> m = ne.get_movement(s);
 
@@ -133,7 +133,7 @@ RHFirstImprovement<T>::RHFirstImprovement(Evaluator<T> &evl, MovementGenerator<T
     : RefinementHeuristicsMethod<T>(evl, mg) {}
 
 template <typename T>
-std::optional<T> RHFirstImprovement<T>::run(const T &s) {
+std::optional<T> RHFirstImprovement<T>::run(T &s) {
     NEFindFirst<T> ne(this->evl, this->mg);
     std::optional<std::reference_wrapper<Movement<T>>> m = ne.get_movement(s);
 
@@ -151,7 +151,7 @@ RHBestImprovement<T>::RHBestImprovement(Evaluator<T> &evl, MovementGenerator<T> 
     : RefinementHeuristicsMethod<T>(evl, mg) {}
 
 template <typename T>
-std::optional<T> RHBestImprovement<T>::run(const T &s) {
+std::optional<T> RHBestImprovement<T>::run(T &s) {
     NEFindBest<T> ne(this->evl, this->mg);
     std::optional<std::reference_wrapper<Movement<T>>> m = ne.get_movement(s);
 
@@ -173,14 +173,14 @@ LSHillClimbing<T>::LSHillClimbing(Evaluator<T> &evl, RefinementHeuristicsMethod<
     : LocalSearch<T>(evl, rh) {}
 
 template <typename T>
-T LSHillClimbing<T>::run(const T &s) {
+T LSHillClimbing<T>::run(T &s) {
     T curr = s;
-    int curr_value = this->evl.evaluate(s);
+    long long curr_value = this->evl.get_evaluation(s);
     while (true) {
         std::optional<T> s1 = this->rh.run(curr);
         if (!s1.has_value()) break;
         
-        int s1_value = this->evl.evaluate(s1.value());
+        long long s1_value = this->evl.get_evaluation(s1.value());
         if (s1_value <= curr_value) break;
         curr = s1.value();
         curr_value = s1_value;
@@ -193,15 +193,15 @@ RandomDescentMethod<T>::RandomDescentMethod(Evaluator<T> &evl, RefinementHeurist
     : LocalSearch<T>(evl, rh), k(k) {}
 
 template <typename T>
-T RandomDescentMethod<T>::run(const T &s) {
+T RandomDescentMethod<T>::run(T &s) {
     T curr = s;
-    long long curr_value = this->evl.evaluate(s);
-    int curr_k = k;
+    long long curr_value = this->evl.get_evaluation(s);
+    int curr_k = this->k;
     while (curr_k > 0) {
         std::optional<T> s1 = this->rh.run(curr);
         if (!s1.has_value()) break;
 
-        int s1_value = this->evl.evaluate(s1.value());
+        long long s1_value = this->evl.get_evaluation(s1.value());
         if (s1_value > curr_value) {
             curr = s1.value();
             curr_value = s1_value;

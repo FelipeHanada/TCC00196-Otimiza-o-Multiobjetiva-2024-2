@@ -13,15 +13,21 @@ public:
     Solution();
     bool is_evaluated() const;
     void set_evaluated(bool e);
-    long long get_evaluation();
+    long long get_evaluation() const;
     void set_evaluation(long long e);
 };
 
 template <typename T>
 class Evaluator {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
-public:
     virtual long long evaluate(const T &s) = 0;
+public:
+    long long get_evaluation(T &s) {
+        if (!s.is_evaluated())
+            s.set_evaluation(this->evaluate(s));
+
+        return s.get_evaluation();
+    };
 };
 
 template <typename T>

@@ -23,10 +23,12 @@ bool KnapsackSolution::get(int i) const {
 
 void KnapsackSolution::set(int i, bool x) {
     s[i] = x;
+    this->set_evaluated(false);
 }
 
 void KnapsackSolution::flip(int i) {
     s[i] = !s[i];
+    this->set_evaluated(false);
 }
 
 KnapsackEvaluator::KnapsackEvaluator(int n, long long q, std::vector<int> v, std::vector<int> w) {
@@ -62,6 +64,43 @@ Knapsack1FlipBitMovement::Knapsack1FlipBitMovement(KnapsackEvaluator &evl, int i
 KnapsackSolution Knapsack1FlipBitMovement::move(const KnapsackSolution &s) {
     KnapsackSolution s1(s);
     s1.flip(this->i);
+    s1.set_evaluation(s1.get_evaluation() + (s1.get(this->i) ? -1 : 1) * this->evl.v[this->i]);
+    return s1;
+}
+
+KnapsackIntervalFlipBitMovement::KnapsackIntervalFlipBitMovement(KnapsackEvaluator &evl, int i, int j)
+    : KnapsackMovement(evl)
+{
+    this->i = i;
+    this->j = j;
+}
+
+KnapsackSolution KnapsackIntervalFlipBitMovement::move(const KnapsackSolution &s) {
+    KnapsackSolution s1(s);
+    for (int k = this->i; k <= this->j; k++) {
+        s1.flip(k);
+        s1.set_evaluation(s1.get_evaluation() + (s1.get(k) ? -1 : 1) * this->evl.v[k]);
+    }
+
+    return s1;
+}
+
+KnapsackInversionMovement::KnapsackInversionMovement(KnapsackEvaluator &evl, int i, int j)
+    : KnapsackMovement(evl)
+{
+    this->i = i;
+    this->j = j;
+}
+
+KnapsackSolution KnapsackInversionMovement::move(const KnapsackSolution &s) {
+    KnapsackSolution s1(s);
+    for (int k = 0; k < (this->j - this->i + 1) / 2; k++) {
+        int a = this->i + k, b = this->j - k;
+        s1.flip(a);
+        s1.set_evaluation(s1.get_evaluation() + (s1.get(a) ? -1 : 1) * this->evl.v[a]);
+        s1.flip(b);
+        s1.set_evaluation(s1.get_evaluation() + (s1.get(b) ? -1 : 1) * this->evl.v[b]);
+    }
     return s1;
 }
 
@@ -79,20 +118,6 @@ std::vector<Movement<KnapsackSolution>*> Knapsack1FlipBitMovementGenerator::gene
     return movements;
 }
 
-KnapsackIntervalFlipBitMovement::KnapsackIntervalFlipBitMovement(KnapsackEvaluator &evl, int i, int j)
-    : KnapsackMovement(evl)
-{
-    this->i = i;
-    this->j = j;
-}
-
-KnapsackSolution KnapsackIntervalFlipBitMovement::move(const KnapsackSolution &s) {
-    KnapsackSolution s1(s);
-    for (int k = this->i; k <= this->j; k++)
-        s1.flip(k);
-    return s1;
-}
-
 KnapsackIntervalFlipBitMovementGenerator::KnapsackIntervalFlipBitMovementGenerator(KnapsackEvaluator &evl, int n)
     : KnapsackMovementGenerator(evl)
 {
@@ -107,22 +132,6 @@ std::vector<Movement<KnapsackSolution>*> KnapsackIntervalFlipBitMovementGenerato
         }
     }
     return movements;
-}
-
-KnapsackInversionMovement::KnapsackInversionMovement(KnapsackEvaluator &evl, int i, int j)
-    : KnapsackMovement(evl)
-{
-    this->i = i;
-    this->j = j;
-}
-
-KnapsackSolution KnapsackInversionMovement::move(const KnapsackSolution &s) {
-    KnapsackSolution s1(s);
-    for (int k = 0; k < (this->j - this->i + 1) / 2; k++) {
-        s1.flip(this->i + k);
-        s1.flip(this->j - k);
-    }
-    return s1;
 }
 
 KnapsackInversionMovementGenerator::KnapsackInversionMovementGenerator(KnapsackEvaluator &evl, int n)

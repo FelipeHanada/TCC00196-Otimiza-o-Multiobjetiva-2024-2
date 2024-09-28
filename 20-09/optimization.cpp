@@ -13,7 +13,7 @@ void Solution::set_evaluated(bool e) {
     this->evaluated = e;
 }
 
-long long Solution::get_evaluation() {
+long long Solution::get_evaluation() const {
     return this->evaluation;
 }
 
