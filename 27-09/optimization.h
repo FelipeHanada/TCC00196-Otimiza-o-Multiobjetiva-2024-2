@@ -26,7 +26,7 @@ public:
 template <typename T>
 class Evaluator {
     static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
-    virtual long long evaluate(const T &s) = 0;
+    virtual long long evaluate(T &s) = 0;
 public:
     long long get_evaluation(T &s);
     void clear_evaluation(T &s);

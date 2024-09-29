@@ -9,26 +9,29 @@
 #include <numeric>
 #include <climits>
 
+class KnapsackEvaluator;
 
 class KnapsackSolution : public Solution {
 public:
     int n;
+    long long q;
     bool *s;
     KnapsackSolution(int n);
     KnapsackSolution(const KnapsackSolution &s);
     bool get(int i) const;
-    void set(int i, bool x);
-    void flip(int i);
+    void set(int i, bool x, KnapsackEvaluator *evl = nullptr);
+    void flip(int i, KnapsackEvaluator *evl = nullptr);
 };
 
 class KnapsackEvaluator : public Evaluator<KnapsackSolution> {
 public:
+    static const long long PUNISHMENT = LLONG_MIN;
     int n;  // item quantity
     long long q;  // capacity
     std::vector<int> v;  // item values
     std::vector<int> w;  // item weights
     KnapsackEvaluator(int n, long long q, std::vector<int> v, std::vector<int> w);
-    long long evaluate(const KnapsackSolution &s) override;
+    long long evaluate(KnapsackSolution &s) override;
 };
 
 class KnapsackMovement : public Movement<KnapsackSolution> {
