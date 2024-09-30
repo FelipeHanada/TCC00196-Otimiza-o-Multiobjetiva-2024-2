@@ -48,16 +48,16 @@ int main() {
 
         KnapsackEvaluator evl(n, q, v, w);
 
-        std::vector<std::pair<std::string, KnapsackSolution (*)(KnapsackEvaluator &evl)>> cms = {
-            std::make_pair("Greedy", [](KnapsackEvaluator &evl) -> KnapsackSolution { return cm_knapsack_greedy(evl); }),
-            std::make_pair("Random", [](KnapsackEvaluator &evl) -> KnapsackSolution { return cm_knapsack_random(evl, 10); }),
-            std::make_pair("Greedy Randomized", [](KnapsackEvaluator &evl) -> KnapsackSolution { return cm_knapsack_greedy_randomized(evl, 10, 0.1); })
+        std::map<std::string, KnapsackSolution (*)(KnapsackEvaluator &evl)> cms = {
+            {"Greedy", [](KnapsackEvaluator &evl) -> KnapsackSolution { return cm_knapsack_greedy(evl); }},
+            {"Random", [](KnapsackEvaluator &evl) -> KnapsackSolution { return cm_knapsack_random(evl, 10); }},
+            {"Greedy Randomized", [](KnapsackEvaluator &evl) -> KnapsackSolution { return cm_knapsack_greedy_randomized(evl, 10, 0.1); }}
         };
 
-        std::vector<std::pair<std::string, MovementGenerator<KnapsackSolution>*>> mgs = {
-            std::make_pair("2 Flip Bit", new Knapsack2FlipBitMovementGenerator(evl, n)),
-            std::make_pair("Interval Flip Bit", new KnapsackIntervalFlipBitMovementGenerator(evl, n)),
-            std::make_pair("Interval Inversion", new KnapsackInversionMovementGenerator(evl, n))
+        std::map<std::string, MovementGenerator<KnapsackSolution>*> mgs = {
+            {"2 Flip Bit", new Knapsack2FlipBitMovementGenerator(evl, n)},
+            {"Interval Flip Bit", new KnapsackIntervalFlipBitMovementGenerator(evl, n)},
+            {"Interval Inversion", new KnapsackInversionMovementGenerator(evl, n)}
         };
 
         for (auto &cm : cms) {
