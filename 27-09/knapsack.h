@@ -14,7 +14,7 @@ class KnapsackEvaluator;
 class KnapsackSolution : public Solution {
 public:
     int n;
-    long long q;
+    long long w;
     bool *s;
     KnapsackSolution(int n);
     KnapsackSolution(const KnapsackSolution &s);
