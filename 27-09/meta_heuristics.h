@@ -5,21 +5,21 @@
 #include "optimization.h"
 #include "neighborhood_exploration.h"
 
-template <typename T>
+template <typename SolutionClass>
 class MetaHeuristicAlgorithm {
-    static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
+    static_assert(std::is_base_of<Solution, SolutionClass>::value, "SolutionClass must be a descendant of Solution");
 protected:
-    Evaluator<T> &evl;
+    Evaluator<SolutionClass> *evl;
 public:
-    MetaHeuristicAlgorithm(Evaluator<T> &evl);
-    virtual T run(T &s) = 0;
+    MetaHeuristicAlgorithm(Evaluator<SolutionClass> *evl);
+    virtual SolutionClass run(const SolutionClass &s) = 0;
 };
 
-template <typename T>
-class MHSimulatedAnnealing : public MetaHeuristicAlgorithm<T> {
-    static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
-    NEFindAny<T> ne;
-    MovementGenerator<T> &mg;
+template <typename SolutionClass>
+class MHSimulatedAnnealing : public MetaHeuristicAlgorithm<SolutionClass> {
+    static_assert(std::is_base_of<Solution, SolutionClass>::value, "SolutionClass must be a descendant of Solution");
+    NEFindAny<SolutionClass> ne;
+    MovementGenerator<SolutionClass> *mg;
     double t;
     int SA_max;
     double t_0;
@@ -27,15 +27,16 @@ class MHSimulatedAnnealing : public MetaHeuristicAlgorithm<T> {
     double a;
 public:
     MHSimulatedAnnealing(
-        Evaluator<T> &evl,
-        MovementGenerator<T> &mg,
+        Evaluator<SolutionClass> *evl,
+        MovementGenerator<SolutionClass> *mg,
         double t,
         int SA_max,
         double a,
         double t_0,
         double t_min = 0.00001
     );
-    T run(T &s) override;
+    SolutionClass pre_heat(const SolutionClass &s, double &final_t);
+    SolutionClass run(const SolutionClass &s) override;
 };
 
 #include "meta_heuristics.tpp"

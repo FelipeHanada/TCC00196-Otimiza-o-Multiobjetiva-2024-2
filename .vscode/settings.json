@@ -94,6 +94,7 @@
         "generator": "cpp",
         "print": "cpp",
         "text_encoding": "cpp",
-        "*.tpp": "cpp"
+        "*.tpp": "cpp",
+        "climits": "cpp"
     }
 }

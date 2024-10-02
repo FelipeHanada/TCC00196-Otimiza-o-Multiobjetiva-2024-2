@@ -1,25 +1,27 @@
 #include "neighborhood_exploration.h"
 
-template <typename T>
-NeighborhoodExplorationMethod<T>::NeighborhoodExplorationMethod(Evaluator<T> &evl, MovementGenerator<T> &mg)
-    : evl(evl), mg(mg) {}
+template <typename SolutionClass>
+NeighborhoodExplorationMethod<SolutionClass>::NeighborhoodExplorationMethod(Evaluator<SolutionClass> *evl, MovementGenerator<SolutionClass> *mg) {
+    this->evl = evl;
+    this->mg = mg;
+}
 
-template <typename T>
-NEFindAny<T>::NEFindAny(Evaluator<T> &evl, MovementGenerator<T> &mg, int k)
-    : NeighborhoodExplorationMethod<T>(evl, mg), k(k) {}
+template <typename SolutionClass>
+NEFindAny<SolutionClass>::NEFindAny(Evaluator<SolutionClass> *evl, MovementGenerator<SolutionClass> *mg, int k)
+    : NeighborhoodExplorationMethod<SolutionClass>(evl, mg), k(k) {}
 
-template <typename T>
-std::optional<std::reference_wrapper<Movement<T>>> NEFindAny<T>::get_movement(T &s) {
-    std::vector<Movement<T>*> movements = this->mg.generate(s);
+template <typename SolutionClass>
+std::optional<std::reference_wrapper<Movement<SolutionClass>>> NEFindAny<SolutionClass>::get_movement(const SolutionClass &s) {
+    std::vector<Movement<SolutionClass>*> movements = this->mg->generate(s);
 
-    T curr(s);
-    std::optional<std::reference_wrapper<Movement<T>>> curr_m = std::nullopt;
-    long long curr_value = this->evl.get_evaluation(s);
+    SolutionClass curr(s);
+    std::optional<std::reference_wrapper<Movement<SolutionClass>>> curr_m = std::nullopt;
+    long long curr_value = this->evl->get_evaluation(s);
     for (int i = 0; i < this->k && movements.size() > 0; i++) {
         int r = std::rand() % movements.size();
-        Movement<T> *m = movements[r];
-        T s1 = m->move(s);
-        long long s1_value = this->evl.get_evaluation(s1);
+        Movement<SolutionClass> *m = movements[r];
+        SolutionClass s1 = m->move(s);
+        long long s1_value = this->evl->get_evaluation(s1);
         if (s1_value > curr_value) {
             curr = s1;
             curr_m = *m;
@@ -34,18 +36,18 @@ std::optional<std::reference_wrapper<Movement<T>>> NEFindAny<T>::get_movement(T 
     return curr_m;
 }
 
-template <typename T>
-NEFindFirst<T>::NEFindFirst(Evaluator<T> &evl, MovementGenerator<T> &mg)
-    : NeighborhoodExplorationMethod<T>(evl, mg) {}
+template <typename SolutionClass>
+NEFindFirst<SolutionClass>::NEFindFirst(Evaluator<SolutionClass> *evl, MovementGenerator<SolutionClass> *mg)
+    : NeighborhoodExplorationMethod<SolutionClass>(evl, mg) {}
 
-template <typename T>
-std::optional<std::reference_wrapper<Movement<T>>> NEFindFirst<T>::get_movement(T &s) {
-    std::vector<Movement<T>*> movements = this->mg.generate(s);
+template <typename SolutionClass>
+std::optional<std::reference_wrapper<Movement<SolutionClass>>> NEFindFirst<SolutionClass>::get_movement(const SolutionClass &s) {
+    std::vector<Movement<SolutionClass>*> movements = this->mg->generate(s);
 
-    long long value = this->evl.get_evaluation(s);
-    for (Movement<T> *m : movements) {
-        T s1 = m->move(s);
-        long long s1_value = this->evl.get_evaluation(s1);
+    long long value = this->evl->get_evaluation(s);
+    for (Movement<SolutionClass> *m : movements) {
+        SolutionClass s1 = m->move(s);
+        long long s1_value = this->evl->get_evaluation(s1);
         if (s1_value > value) {
             return *m;
         }
@@ -53,38 +55,38 @@ std::optional<std::reference_wrapper<Movement<T>>> NEFindFirst<T>::get_movement(
     return std::nullopt;
 }
 
-template <typename T>
-NEFindNext<T>::NEFindNext(Evaluator<T> &evl, MovementGenerator<T> &mg, int j)
-    : NeighborhoodExplorationMethod<T>(evl, mg), j(j) {}
+template <typename SolutionClass>
+NEFindNext<SolutionClass>::NEFindNext(Evaluator<SolutionClass> *evl, MovementGenerator<SolutionClass> *mg, int j)
+    : NeighborhoodExplorationMethod<SolutionClass>(evl, mg), j(j) {}
 
-template <typename T>
-std::optional<std::reference_wrapper<Movement<T>>> NEFindNext<T>::get_movement(T &s) {
-    std::vector<Movement<T>*> movements = this->mg.generate(s);
+template <typename SolutionClass>
+std::optional<std::reference_wrapper<Movement<SolutionClass>>> NEFindNext<SolutionClass>::get_movement(const SolutionClass &s) {
+    std::vector<Movement<SolutionClass>*> movements = this->mg->generate(s);
 
-    long long value = this->evl.get_evaluation(s);
+    long long value = this->evl->get_evaluation(s);
     for (int i = j + 1; i < movements.size(); i++) {
-        Movement<T> m = movements[i];
-        T s1 = m->move(s);
-        long long s1_value = this->evl.get_evaluation(s1);
+        Movement<SolutionClass> m = movements[i];
+        SolutionClass s1 = m->move(s);
+        long long s1_value = this->evl->get_evaluation(s1);
         if (s1_value > value) return m;
     }
     return std::nullopt;
 }
 
-template <typename T>
-NEFindBest<T>::NEFindBest(Evaluator<T> &evl, MovementGenerator<T> &mg)
-    : NeighborhoodExplorationMethod<T>(evl, mg) {}
+template <typename SolutionClass>
+NEFindBest<SolutionClass>::NEFindBest(Evaluator<SolutionClass> *evl, MovementGenerator<SolutionClass> *mg)
+    : NeighborhoodExplorationMethod<SolutionClass>(evl, mg) {}
 
-template <typename T>
-std::optional<std::reference_wrapper<Movement<T>>> NEFindBest<T>::get_movement(T &s) {
-    std::vector<Movement<T>*> movements = this->mg.generate(s);
+template <typename SolutionClass>
+std::optional<std::reference_wrapper<Movement<SolutionClass>>> NEFindBest<SolutionClass>::get_movement(const SolutionClass &s) {
+    std::vector<Movement<SolutionClass>*> movements = this->mg->generate(s);
 
-    T curr(s);
-    std::optional<std::reference_wrapper<Movement<T>>> curr_m = std::nullopt;
-    long long curr_value = this->evl.get_evaluation(s);
-    for (Movement<T> *m : movements) {
-        T s1 = m->move(s);
-        long long s1_value = this->evl.get_evaluation(s1);
+    SolutionClass curr(s);
+    std::optional<std::reference_wrapper<Movement<SolutionClass>>> curr_m = std::nullopt;
+    long long curr_value = this->evl->get_evaluation(s);
+    for (Movement<SolutionClass> *m : movements) {
+        SolutionClass s1 = m->move(s);
+        long long s1_value = this->evl->get_evaluation(s1);
         if (s1_value > curr_value) {
             curr = s1;
             curr_m = *m;
@@ -95,98 +97,102 @@ std::optional<std::reference_wrapper<Movement<T>>> NEFindBest<T>::get_movement(T
     return curr_m;
 }
 
-template <typename T>
-std::vector<T> all_neighbors(T &s, MovementGenerator<T> &mg) {
-    static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
+template <typename SolutionClass>
+std::vector<SolutionClass> all_neighbors(SolutionClass &s, MovementGenerator<SolutionClass> *mg) {
+    static_assert(std::is_base_of<Solution, SolutionClass>::value, "SolutionClass must be a descendant of Solution");
 
-    std::vector<T> r;
-    for (Movement<T> *m : mg.get(s)) {
+    std::vector<SolutionClass> r;
+    for (Movement<SolutionClass> *m : mg->get(s)) {
         r.push_back(m->move(s));
     }
     return r;
 }
 
-template <typename T>
-RefinementHeuristicsMethod<T>::RefinementHeuristicsMethod(Evaluator<T> &evl, MovementGenerator<T> &mg)
-    : evl(evl), mg(mg) {}
+template <typename SolutionClass>
+RefinementHeuristicsMethod<SolutionClass>::RefinementHeuristicsMethod(Evaluator<SolutionClass> *evl, MovementGenerator<SolutionClass> *mg) {
+    this->evl = evl;
+    this->mg = mg;
+}
 
-template <typename T>
-RHRandomSelection<T>::RHRandomSelection(Evaluator<T> &evl, MovementGenerator<T> &mg, int k)
-    : RefinementHeuristicsMethod<T>(evl, mg), k(k) {}
+template <typename SolutionClass>
+RHRandomSelection<SolutionClass>::RHRandomSelection(Evaluator<SolutionClass> *evl, MovementGenerator<SolutionClass> *mg, int k)
+    : RefinementHeuristicsMethod<SolutionClass>(evl, mg), k(k) {}
 
-template <typename T>
-std::optional<T> RHRandomSelection<T>::run(T &s) {
-    NEFindAny<T> ne(this->evl, this->mg, this->k);
-    std::optional<std::reference_wrapper<Movement<T>>> m = ne.get_movement(s);
+template <typename SolutionClass>
+std::optional<SolutionClass> RHRandomSelection<SolutionClass>::run(const SolutionClass &s) {
+    NEFindAny<SolutionClass> ne(this->evl, this->mg, this->k);
+    std::optional<std::reference_wrapper<Movement<SolutionClass>>> m = ne.get_movement(s);
 
     if (m.has_value()) {
-        Movement<T> &m1 = m.value().get();
-        T s1 = m1.move(s);
+        Movement<SolutionClass> &m1 = m.value().get();
+        SolutionClass s1 = m1.move(s);
         return s1;
     }
 
     return std::nullopt;
 }
 
-template <typename T>
-RHFirstImprovement<T>::RHFirstImprovement(Evaluator<T> &evl, MovementGenerator<T> &mg)
-    : RefinementHeuristicsMethod<T>(evl, mg) {}
+template <typename SolutionClass>
+RHFirstImprovement<SolutionClass>::RHFirstImprovement(Evaluator<SolutionClass> *evl, MovementGenerator<SolutionClass> *mg)
+    : RefinementHeuristicsMethod<SolutionClass>(evl, mg) {}
 
-template <typename T>
-std::optional<T> RHFirstImprovement<T>::run(T &s) {
-    NEFindFirst<T> ne(this->evl, this->mg);
-    std::optional<std::reference_wrapper<Movement<T>>> m = ne.get_movement(s);
+template <typename SolutionClass>
+std::optional<SolutionClass> RHFirstImprovement<SolutionClass>::run(const SolutionClass &s) {
+    NEFindFirst<SolutionClass> ne(this->evl, this->mg);
+    std::optional<std::reference_wrapper<Movement<SolutionClass>>> m = ne.get_movement(s);
 
     if (m.has_value()) {
-        Movement<T> &m1 = m.value().get();
-        T s1 = m1.move(s);
+        Movement<SolutionClass> &m1 = m.value().get();
+        SolutionClass s1 = m1.move(s);
         return s1;
     }
 
     return std::nullopt;
 }
 
-template <typename T>
-RHBestImprovement<T>::RHBestImprovement(Evaluator<T> &evl, MovementGenerator<T> &mg)
-    : RefinementHeuristicsMethod<T>(evl, mg) {}
+template <typename SolutionClass>
+RHBestImprovement<SolutionClass>::RHBestImprovement(Evaluator<SolutionClass> *evl, MovementGenerator<SolutionClass> *mg)
+    : RefinementHeuristicsMethod<SolutionClass>(evl, mg) {}
 
-template <typename T>
-std::optional<T> RHBestImprovement<T>::run(T &s) {
-    NEFindBest<T> ne(this->evl, this->mg);
-    std::optional<std::reference_wrapper<Movement<T>>> m = ne.get_movement(s);
+template <typename SolutionClass>
+std::optional<SolutionClass> RHBestImprovement<SolutionClass>::run(const SolutionClass &s) {
+    NEFindBest<SolutionClass> ne(this->evl, this->mg);
+    std::optional<std::reference_wrapper<Movement<SolutionClass>>> m = ne.get_movement(s);
 
     if (m.has_value()) {
-        Movement<T> &m1 = m.value().get();
-        T s1 = m1.move(s);
+        Movement<SolutionClass> &m1 = m.value().get();
+        SolutionClass s1 = m1.move(s);
         return s1;
     }
 
     return std::nullopt;
 }
 
-template <typename T>
-LocalSearch<T>::LocalSearch(Evaluator<T> &evl, RefinementHeuristicsMethod<T> &rh)
-    : evl(evl), rh(rh) {}
+template <typename SolutionClass>
+LocalSearch<SolutionClass>::LocalSearch(Evaluator<SolutionClass> *evl, RefinementHeuristicsMethod<SolutionClass> *rh) {
+    this->evl = evl;
+    this->rh = rh;
+}
 
-template <typename T>
-LSHillClimbing<T>::LSHillClimbing(Evaluator<T> &evl, RefinementHeuristicsMethod<T> &rh)
-    : LocalSearch<T>(evl, rh) {}
+template <typename SolutionClass>
+LSHillClimbing<SolutionClass>::LSHillClimbing(Evaluator<SolutionClass> *evl, RefinementHeuristicsMethod<SolutionClass> *rh)
+    : LocalSearch<SolutionClass>(evl, rh) {}
 
-template <typename T>
-T LSHillClimbing<T>::run(T &s, float t) {
+template <typename SolutionClass>
+SolutionClass LSHillClimbing<SolutionClass>::run(const SolutionClass &s, float t) {
     auto start = std::chrono::high_resolution_clock::now();
 
-    T curr = s;
-    long long curr_value = this->evl.get_evaluation(s);
+    SolutionClass curr = s;
+    long long curr_value = this->evl->get_evaluation(s);
     while (true) {
         auto current = std::chrono::high_resolution_clock::now();
         if (std::chrono::duration<float>(current - start).count() > t)
             break;
 
-        std::optional<T> s1 = this->rh.run(curr);
+        std::optional<SolutionClass> s1 = this->rh->run(curr);
         if (!s1.has_value()) break;
         
-        long long s1_value = this->evl.get_evaluation(s1.value());
+        long long s1_value = this->evl->get_evaluation(s1.value());
         if (s1_value <= curr_value) break;
         curr = s1.value();
         curr_value = s1_value;
@@ -194,26 +200,26 @@ T LSHillClimbing<T>::run(T &s, float t) {
     return curr;
 }
 
-template <typename T>
-RandomDescentMethod<T>::RandomDescentMethod(Evaluator<T> &evl, RefinementHeuristicsMethod<T> &rh, int k)
-    : LocalSearch<T>(evl, rh), k(k) {}
+template <typename SolutionClass>
+RandomDescentMethod<SolutionClass>::RandomDescentMethod(Evaluator<SolutionClass> *evl, RefinementHeuristicsMethod<SolutionClass> *rh, int k)
+    : LocalSearch<SolutionClass>(evl, rh), k(k) {}
 
-template <typename T>
-T RandomDescentMethod<T>::run(T &s, float t) {
+template <typename SolutionClass>
+SolutionClass RandomDescentMethod<SolutionClass>::run(const SolutionClass &s, float t) {
     auto start = std::chrono::high_resolution_clock::now();
 
-    T curr = s;
-    long long curr_value = this->evl.get_evaluation(s);
+    SolutionClass curr = s;
+    long long curr_value = this->evl->get_evaluation(s);
     int curr_k = this->k;
     while (curr_k > 0) {
         auto current = std::chrono::high_resolution_clock::now();
         if (std::chrono::duration<float>(current - start).count() > t)
             break;
 
-        std::optional<T> s1 = this->rh.run(curr);
+        std::optional<SolutionClass> s1 = this->rh->run(curr);
         if (!s1.has_value()) break;
 
-        long long s1_value = this->evl.get_evaluation(s1.value());
+        long long s1_value = this->evl->get_evaluation(s1.value());
         if (s1_value > curr_value) {
             curr = s1.value();
             curr_value = s1_value;

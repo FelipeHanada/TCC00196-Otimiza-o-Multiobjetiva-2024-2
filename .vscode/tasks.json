@@ -3,12 +3,12 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "C/C++: g++.exe build active file",
-            "command": "C:\\msys64\\ucrt64\\bin\\g++.exe",
+            "label": "C/C++: g++ build active file",
+            "command": "g++",
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "${fileDirname}/*.cpp",
+                "${fileDirname}\\*.cpp",
                 "-o",
                 "${fileDirname}\\output.exe"
             ],
@@ -22,7 +22,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "detail": "compiler: C:\\msys64\\ucrt64\\bin\\g++.exe"
+            "detail": "compiler: g++"
         }
     ]
 }

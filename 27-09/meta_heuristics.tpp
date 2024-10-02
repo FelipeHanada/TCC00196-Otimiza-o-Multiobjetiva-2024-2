@@ -1,20 +1,23 @@
 #include "meta_heuristics.h"
 
-template <typename T>
-MetaHeuristicAlgorithm<T>::MetaHeuristicAlgorithm(Evaluator<T> &evl) : evl(evl) {}
+template <class SolutionClass>
+MetaHeuristicAlgorithm<SolutionClass>::MetaHeuristicAlgorithm(Evaluator<SolutionClass> *evl) {
+    this->evl = evl;
+}
 
-template <typename T>
-MHSimulatedAnnealing<T>::MHSimulatedAnnealing(
-    Evaluator<T> &evl,
-    MovementGenerator<T> &mg,
+template <class SolutionClass>
+MHSimulatedAnnealing<SolutionClass>::MHSimulatedAnnealing(
+    Evaluator<SolutionClass> *evl,
+    MovementGenerator<SolutionClass> *mg,
     double t,
     int SA_max,
     double a,
     double t_0,
     double t_min
 )
-    : MetaHeuristicAlgorithm<T>(evl), mg(mg), ne(evl, mg, 1)
+    : MetaHeuristicAlgorithm<SolutionClass>(evl), ne(evl, mg, 1)
 {
+    this->mg = mg;
     this->t = t;
     this->SA_max = SA_max;
     this->a = a;
@@ -22,21 +25,33 @@ MHSimulatedAnnealing<T>::MHSimulatedAnnealing(
     this->t_min = t_min;
 }
 
-template <typename T>
-T MHSimulatedAnnealing<T>::run(T &s) { 
-    T s_prime = s;
-    long long s_prime_value = this->evl.get_evaluation(s_prime);
-    T s_curr = s;
+template <class SolutionClass>
+SolutionClass MHSimulatedAnnealing<SolutionClass>::pre_heat(const SolutionClass &s, double & final_t) {
+    // TO IMPLEMENT
+}
+
+template <class SolutionClass>
+SolutionClass MHSimulatedAnnealing<SolutionClass>::run(const SolutionClass &s) {     
+    SolutionClass s_prime = s;
+    long long s_prime_value = this->evl->get_evaluation(s_prime);
+    SolutionClass s_curr = s;
     long long s_curr_value = s_prime_value;
 
     double curr_t = this->t_0;
-    while (curr_t > this->t_min) {
-        for (int i=0; i<this->SA_max; i++) {
+
+    auto start = std::chrono::high_resolution_clock::now();
+    auto current = std::chrono::high_resolution_clock::now();
+    while (curr_t > this->t_min && std::chrono::duration<float>(current - start).count() < t) {
+        current = std::chrono::high_resolution_clock::now();
+
+        for (int i=0; i<this->SA_max && std::chrono::duration<float>(current - start).count() < t; i++) {
+            current = std::chrono::high_resolution_clock::now();
+
             auto m = this->ne.get_movement(s_curr);
             if (!m.has_value()) break;
             
-            T s1 = m.value().get().move(s_curr);
-            long long s1_value = this->evl.get_evaluation(s1);
+            SolutionClass s1 = m.value().get().move(s_curr);
+            long long s1_value = this->evl->get_evaluation(s1);
 
             long long delta = s1_value - s_curr_value;
             if (delta > 0) {

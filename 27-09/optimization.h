@@ -6,45 +6,51 @@
 #include <optional>
 #include <type_traits>
 
-template <typename T>
+template <typename SolutionClass>
 class Evaluator;
 
 class Solution {
-    bool evaluated;
-    long long last_evaluation;
+private:
+    mutable bool evaluated;
+    mutable long long last_evaluation;
 protected:
     bool is_evaluated() const;
-    void set_evaluated(bool e);
+    void set_evaluated(bool e) const;
+    void clear_evaluation() const;
+
     long long get_last_evaluation() const;
-    void set_evaluation(long long e);
+    void set_evaluation(long long e) const;
 public:
     Solution();
-    template <typename T>
+
+    template <typename SolutionClass>
     friend class Evaluator;
+
+    template <typename SolutionClass>
+    friend class Movement;
 };
 
-template <typename T>
+template <typename SolutionClass>
 class Evaluator {
-    static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
-    virtual long long evaluate(T &s) = 0;
+    static_assert(std::is_base_of<Solution, SolutionClass>::value, "SolutionClass must be a descendant of Solution");
+protected:
+    virtual long long evaluate(const SolutionClass &s) const = 0;
 public:
-    long long get_evaluation(T &s);
-    void clear_evaluation(T &s);
-    void set_evaluation(T &s, long long e);
+    long long get_evaluation(const SolutionClass &s) const;
 };
 
-template <typename T>
+template <typename SolutionClass>
 class Movement {
-    static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
+    static_assert(std::is_base_of<Solution, SolutionClass>::value, "SolutionClass must be a descendant of Solution");
 public:
-    virtual T move(const T &s) = 0;
+    virtual SolutionClass move(const SolutionClass &s) = 0;
 };
 
-template <typename T>
+template <typename SolutionClass>
 class MovementGenerator {
-    static_assert(std::is_base_of<Solution, T>::value, "T must be a descendant of Solution");
+    static_assert(std::is_base_of<Solution, SolutionClass>::value, "SolutionClass must be a descendant of Solution");
 public:
-    virtual std::vector<Movement<T>*> generate(const T &s) = 0;
+    virtual std::vector<Movement<SolutionClass>*> generate(const SolutionClass &s) = 0;
 };
 
 #include "optimization.tpp"
