@@ -94,8 +94,7 @@ int main() {
             std::cout << std::setw(100) << std::setfill('-') << "" << std::endl;
         }
 
-        for (auto &mg : mgs) {
+        for (auto &mg : mgs)
             delete mg.second;
-        }
     }
 }
