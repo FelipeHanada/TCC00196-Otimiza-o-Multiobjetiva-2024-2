@@ -47,10 +47,10 @@ SolutionClass MHSimulatedAnnealing<SolutionClass>::run(const SolutionClass &s) {
         for (int i=0; i<this->SA_max && std::chrono::duration<float>(current - start).count() < t; i++) {
             current = std::chrono::high_resolution_clock::now();
 
-            auto m = this->ne.get_movement(s_curr);
-            if (!m.has_value()) break;
+            Movement<SolutionClass> *m = this->ne.get_movement(s_curr);
+            if (m == NULL) break;
             
-            SolutionClass s1 = m.value().get().move(s_curr);
+            SolutionClass s1 = m->move(s_curr);
             long long s1_value = this->evl->get_evaluation(s1);
 
             long long delta = s1_value - s_curr_value;

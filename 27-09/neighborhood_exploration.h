@@ -2,7 +2,6 @@
 #define NEIGHBORHOOD_EXPLORATION_H
 
 #include <vector>
-#include <optional>
 #include <algorithm>
 #include <cstdlib>
 #include <functional>
@@ -15,7 +14,7 @@ public:
     Evaluator<SolutionClass> *evl;
     MovementGenerator<SolutionClass> *mg;
     NeighborhoodExplorationMethod(Evaluator<SolutionClass> *evl, MovementGenerator<SolutionClass> *mg);
-    virtual std::optional<std::reference_wrapper<Movement<SolutionClass>>> get_movement(const SolutionClass &s) = 0;
+    virtual Movement<SolutionClass>* get_movement(const SolutionClass &s) = 0;
 };
 
 template <typename SolutionClass>
@@ -25,7 +24,7 @@ private:
     int k;
 public:
     NEFindAny(Evaluator<SolutionClass> *evl, MovementGenerator<SolutionClass> *mg, int k);
-    std::optional<std::reference_wrapper<Movement<SolutionClass>>> get_movement(const SolutionClass &s) override;
+    Movement<SolutionClass>* get_movement(const SolutionClass &s) override;
 };
 
 template <typename SolutionClass>
@@ -33,7 +32,7 @@ class NEFindFirst : public NeighborhoodExplorationMethod<SolutionClass> {
     static_assert(std::is_base_of<Solution, SolutionClass>::value, "SolutionClass must be a descendant of Solution");
 public:
     NEFindFirst(Evaluator<SolutionClass> *evl, MovementGenerator<SolutionClass> *mg);
-    std::optional<std::reference_wrapper<Movement<SolutionClass>>> get_movement(const SolutionClass &s) override;
+    Movement<SolutionClass>* get_movement(const SolutionClass &s) override;
 };
 
 template <typename SolutionClass>
@@ -43,7 +42,7 @@ private:
     int j;
 public:
     NEFindNext(Evaluator<SolutionClass> *evl, MovementGenerator<SolutionClass> *mg, int j);
-    std::optional<std::reference_wrapper<Movement<SolutionClass>>> get_movement(const SolutionClass &s) override;
+    Movement<SolutionClass>* get_movement(const SolutionClass &s) override;
 };
 
 template <typename SolutionClass>
@@ -51,7 +50,7 @@ class NEFindBest : public NeighborhoodExplorationMethod<SolutionClass> {
     static_assert(std::is_base_of<Solution, SolutionClass>::value, "SolutionClass must be a descendant of Solution");
 public:
     NEFindBest(Evaluator<SolutionClass> *evl, MovementGenerator<SolutionClass> *mg);
-    std::optional<std::reference_wrapper<Movement<SolutionClass>>> get_movement(const SolutionClass &s) override;
+    Movement<SolutionClass>* get_movement(const SolutionClass &s) override;
 };
 
 template <typename SolutionClass>

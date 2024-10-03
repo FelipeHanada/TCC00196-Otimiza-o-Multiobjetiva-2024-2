@@ -84,7 +84,7 @@ int main() {
 
                 MHSimulatedAnnealing<KnapsackSolution> simulated_annealing(
                     &evl, mg.second, 100, 10,
-                    0.99, 100000000, 0.00001
+                    0.99, 100000, 0.00001
                 );
                 s1 = simulated_annealing.run(s);
                 print_solution("Meta Heuristic: " + cm.first + " + Simulated Annealing (" + mg.first + ")", &evl, &s1, &s);
