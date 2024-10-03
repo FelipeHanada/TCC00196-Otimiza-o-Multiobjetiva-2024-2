@@ -51,6 +51,8 @@ SolutionClass MHSimulatedAnnealing<SolutionClass>::run(const SolutionClass &s) {
             if (m == NULL) break;
             
             SolutionClass s1 = m->move(s_curr);
+            delete m;
+            
             long long s1_value = this->evl->get_evaluation(s1);
 
             long long delta = s1_value - s_curr_value;
