@@ -93,8 +93,14 @@ Knapsack2FlipBitMovement::Knapsack2FlipBitMovement(KnapsackEvaluator *evl, int i
 
 KnapsackSolution Knapsack2FlipBitMovement::move(const KnapsackSolution &s) {
     KnapsackSolution s1(s);
-    s1.flip(this->i, this->evl);
-    s1.flip(this->j, this->evl);
+
+    if (this->i == this->j) {
+        s1.flip(this->i, this->evl);
+        return s1;
+    } else {
+        s1.flip(this->i, this->evl);
+        s1.flip(this->j, this->evl);
+    }
 
     return s1;
 }
@@ -136,25 +142,55 @@ Knapsack2FlipBitMovementGenerator::Knapsack2FlipBitMovementGenerator(KnapsackEva
     : KnapsackMovementGenerator(evl)
 {
     this->n = n;
+    this->curr_i = 0;
+    this->curr_j = 0;
 }
 
-std::vector<Movement<KnapsackSolution>*> Knapsack2FlipBitMovementGenerator::generate(const KnapsackSolution &s) {
+std::vector<Movement<KnapsackSolution>*> Knapsack2FlipBitMovementGenerator::get_all(const KnapsackSolution &s) {
     std::vector<Movement<KnapsackSolution>*> movements;
     for (int i = 0; i < this->n; i++) {
-        for (int j = i + 1; j < this->n; j++) {
+        for (int j = i; j < this->n; j++) {
             movements.push_back(new Knapsack2FlipBitMovement(this->evl, i, j));
         }
     }
     return movements;
 }
 
+Movement<KnapsackSolution>* Knapsack2FlipBitMovementGenerator::get_random() {
+    int i = rand() % this->n;
+    int j = rand() % this->n;
+    return new Knapsack2FlipBitMovement(this->evl, i, j);
+}
+
+bool Knapsack2FlipBitMovementGenerator::has_next() {
+    return this->curr_i < this->n;
+}
+
+Movement<KnapsackSolution>* Knapsack2FlipBitMovementGenerator::next() {
+    if (this->curr_i == this->n) return nullptr;
+    Knapsack2FlipBitMovement *m = new Knapsack2FlipBitMovement(this->evl, this->curr_i, this->curr_j);
+    this->curr_j++;
+    if (this->curr_j == this->n) {
+        this->curr_i++;
+        this->curr_j = this->curr_i;
+    }
+    return m;
+}
+
+void Knapsack2FlipBitMovementGenerator::reset() {
+    this->curr_i = 0;
+    this->curr_j = 0;
+}
+
 KnapsackIntervalFlipBitMovementGenerator::KnapsackIntervalFlipBitMovementGenerator(KnapsackEvaluator *evl, int n)
     : KnapsackMovementGenerator(evl)
 {
     this->n = n;
+    this->curr_i = 0;
+    this->curr_j = 0;
 }
 
-std::vector<Movement<KnapsackSolution>*> KnapsackIntervalFlipBitMovementGenerator::generate(const KnapsackSolution &s) {
+std::vector<Movement<KnapsackSolution>*> KnapsackIntervalFlipBitMovementGenerator::get_all(const KnapsackSolution &s) {
     std::vector<Movement<KnapsackSolution>*> movements;
     for (int i = 0; i < this->n; i++) {
         for (int j = i; j < this->n; j++) {
@@ -164,13 +200,41 @@ std::vector<Movement<KnapsackSolution>*> KnapsackIntervalFlipBitMovementGenerato
     return movements;
 }
 
+Movement<KnapsackSolution>* KnapsackIntervalFlipBitMovementGenerator::get_random() {
+    int i = rand() % this->n;
+    int j = rand() % this->n;
+    return new KnapsackIntervalFlipBitMovement(this->evl, i, j);
+}
+
+bool KnapsackIntervalFlipBitMovementGenerator::has_next() {
+    return this->curr_i < this->n;
+}
+
+Movement<KnapsackSolution>* KnapsackIntervalFlipBitMovementGenerator::next() {
+    if (this->curr_i == this->n) return nullptr;
+    KnapsackIntervalFlipBitMovement *m = new KnapsackIntervalFlipBitMovement(this->evl, this->curr_i, this->curr_j);
+    this->curr_j++;
+    if (this->curr_j == this->n) {
+        this->curr_i++;
+        this->curr_j = this->curr_i;
+    }
+    return m;
+}
+
+void KnapsackIntervalFlipBitMovementGenerator::reset() {
+    this->curr_i = 0;
+    this->curr_j = 0;
+}
+
 KnapsackInversionMovementGenerator::KnapsackInversionMovementGenerator(KnapsackEvaluator *evl, int n)
     : KnapsackMovementGenerator(evl)
 {
     this->n = n;
+    this->curr_i = 0;
+    this->curr_j = 0;
 }
 
-std::vector<Movement<KnapsackSolution>*> KnapsackInversionMovementGenerator::generate(const KnapsackSolution &s) {
+std::vector<Movement<KnapsackSolution>*> KnapsackInversionMovementGenerator::get_all(const KnapsackSolution &s) {
     std::vector<Movement<KnapsackSolution>*> movements;
     for (int i = 0; i < this->n; i++) {
         for (int j = i; j < this->n; j++) {
@@ -178,6 +242,32 @@ std::vector<Movement<KnapsackSolution>*> KnapsackInversionMovementGenerator::gen
         }
     }
     return movements;
+}
+
+Movement<KnapsackSolution>* KnapsackInversionMovementGenerator::get_random() {
+    int i = rand() % this->n;
+    int j = rand() % this->n;
+    return new KnapsackInversionMovement(this->evl, i, j);
+}
+
+bool KnapsackInversionMovementGenerator::has_next() {
+    return this->curr_i < this->n;
+}
+
+Movement<KnapsackSolution>* KnapsackInversionMovementGenerator::next() {
+    if (this->curr_i == this->n) return nullptr;
+    KnapsackInversionMovement *m = new KnapsackInversionMovement(this->evl, this->curr_i, this->curr_j);
+    this->curr_j++;
+    if (this->curr_j == this->n) {
+        this->curr_i++;
+        this->curr_j = this->curr_i;
+    }
+    return m;
+}
+
+void KnapsackInversionMovementGenerator::reset() {
+    this->curr_i = 0;
+    this->curr_j = 0;
 }
 
 KnapsackSolution cm_knapsack_greedy(const KnapsackEvaluator *evl) {
@@ -290,7 +380,7 @@ KnapsackSolution cm_knapsack_greedy_randomized(const KnapsackEvaluator *evl, flo
         );
 
         size_t rc_size = std::distance(rc_end, c_value_ordered.end());
-        int g = (rc_size == 0) ? 0 : c_value_ordered[std::rand() % rc_size];
+        int g = (rc_size == 0) ? c_value_ordered[0] : c_value_ordered[std::rand() % rc_size];
 
         curr_Q -= evl->w[g];
         s.set(g, true);

@@ -12,21 +12,12 @@ NEFindAny<SolutionClass>::NEFindAny(Evaluator<SolutionClass> *evl, MovementGener
 
 template <typename SolutionClass>
 Movement<SolutionClass>* NEFindAny<SolutionClass>::get_movement(const SolutionClass &s) {
-    std::vector<Movement<SolutionClass>*> movements = this->mg->generate(s);
-    std::vector<int> indexes(movements.size());
-    std::iota(indexes.begin(), indexes.end(), 0);
-
     SolutionClass curr(s);
     Movement<SolutionClass>* curr_m = NULL;
     long long curr_value = this->evl->get_evaluation(s);
-    for (int i = 0; i < this->k && indexes.size() > 0; i++) {
-        int r = indexes[std::rand() % indexes.size()];
-        indexes.erase(
-            std::remove(indexes.begin(), indexes.end(), r),
-            indexes.end()
-        );
-        
-        Movement<SolutionClass> *m = movements[r];
+    
+    for (int i = 0; i < this->k; i++) {
+        Movement<SolutionClass> *m = this->mg->get_random();
         SolutionClass s1 = m->move(s);
         long long s1_value = this->evl->get_evaluation(s1);
         if (s1_value > curr_value) {
@@ -38,9 +29,6 @@ Movement<SolutionClass>* NEFindAny<SolutionClass>::get_movement(const SolutionCl
             delete m;
         }
     }
-
-    for (int i : indexes)
-        delete movements[i];
 
     return curr_m;
 }
@@ -51,21 +39,19 @@ NEFindFirst<SolutionClass>::NEFindFirst(Evaluator<SolutionClass> *evl, MovementG
 
 template <typename SolutionClass>
 Movement<SolutionClass>* NEFindFirst<SolutionClass>::get_movement(const SolutionClass &s) {
-    std::vector<Movement<SolutionClass>*> movements = this->mg->generate(s);
-
     long long value = this->evl->get_evaluation(s);
-    Movement<SolutionClass>* m = NULL;
-    for (int i = 0; i < movements.size(); i++) {
-        Movement<SolutionClass> *movement = movements[i];
-        SolutionClass s1 = movement->move(s);
+
+    this->mg->reset();
+    while (this->mg->has_next()) {
+        Movement<SolutionClass> *m = this->mg->next();
+        SolutionClass s1 = m->move(s);
         long long s1_value = this->evl->get_evaluation(s1);
-        if (m == NULL && s1_value > value) {
-            m = movement;
-            continue;
+        if (s1_value > value) {
+            return m;
         }
-        delete movement;
+        delete m;
     }
-    
+
     return NULL;
 }
 
@@ -75,24 +61,21 @@ NEFindNext<SolutionClass>::NEFindNext(Evaluator<SolutionClass> *evl, MovementGen
 
 template <typename SolutionClass>
 Movement<SolutionClass>* NEFindNext<SolutionClass>::get_movement(const SolutionClass &s) {
-    std::vector<Movement<SolutionClass>*> movements = this->mg->generate(s);
-
-    for (int i=0; i <= this->j && i < movements.size(); i++)
-        delete movements[i];
+    this->mg->reset();
+    for (int i = 0; i <= this->j; i++)
+        delete this->mg->next();
 
     long long value = this->evl->get_evaluation(s);
-    Movement<SolutionClass>* m = NULL;
-    for (int i = this->j + 1; i < movements.size(); i++) {
-        Movement<SolutionClass> *movement = movements[i];
-        SolutionClass s1 = movement->move(s);
+    while (this->mg->has_next()) {
+        Movement<SolutionClass> *m = this->mg->next();
+        SolutionClass s1 = m->move(s);
         long long s1_value = this->evl->get_evaluation(s1);
-        if (m == NULL && s1_value > value) {
-            m = movement;
-            continue;
+        if (s1_value > value) {
+            return m;
         }
-        delete movement;
+        delete m;
     }
-    
+
     return NULL;
 }
 
@@ -102,12 +85,13 @@ NEFindBest<SolutionClass>::NEFindBest(Evaluator<SolutionClass> *evl, MovementGen
 
 template <typename SolutionClass>
 Movement<SolutionClass>* NEFindBest<SolutionClass>::get_movement(const SolutionClass &s) {
-    std::vector<Movement<SolutionClass>*> movements = this->mg->generate(s);
+    this->mg->reset();
 
     SolutionClass curr(s);
     Movement<SolutionClass>* curr_m = NULL;
     long long curr_value = this->evl->get_evaluation(s);
-    for (Movement<SolutionClass> *m : movements) {
+    while (this->mg->has_next()) {
+        Movement<SolutionClass> *m = this->mg->next();
         SolutionClass s1 = m->move(s);
         long long s1_value = this->evl->get_evaluation(s1);
         if (s1_value > curr_value) {
@@ -119,7 +103,7 @@ Movement<SolutionClass>* NEFindBest<SolutionClass>::get_movement(const SolutionC
             delete m;
         }
     }
-
+    
     return curr_m;
 }
 

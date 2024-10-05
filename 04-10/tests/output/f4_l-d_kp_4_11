@@ -1,10 +1,10 @@
 Optimum: 23
 ----------------------------------------------------------------------------------------------------
 Constructive Method: Greedy
-Evaluation: 16 (0.3% from optimum) / 0 1 
+Evaluation: 16 (30% from optimum) / 0 1 
 
 Local Search: Greedy + Hill Climbing + First Improvement (2 Flip Bit)
-Evaluation: 16 -> 16 (0.3% from optimum) / 0 1 
+Evaluation: 16 -> 23 (0% from optimum) / 1 3 
 
 Local Search: Greedy + Hill Climbing + Best Improvement (2 Flip Bit)
 Evaluation: 16 -> 23 (0% from optimum) / 1 3 
@@ -15,7 +15,7 @@ Evaluation: 16 -> 23 (0% from optimum) / 1 3
 Meta Heuristic: Greedy + Simulated Annealing (2 Flip Bit)
 Evaluation: 16 -> 23 (0% from optimum) / 1 3 
 Local Search: Greedy + Hill Climbing + First Improvement (Interval Flip Bit)
-Evaluation: 16 -> 16 (0.3% from optimum) / 0 1 
+Evaluation: 16 -> 23 (0% from optimum) / 1 3 
 
 Local Search: Greedy + Hill Climbing + Best Improvement (Interval Flip Bit)
 Evaluation: 16 -> 23 (0% from optimum) / 1 3 
@@ -26,7 +26,7 @@ Evaluation: 16 -> 23 (0% from optimum) / 1 3
 Meta Heuristic: Greedy + Simulated Annealing (Interval Flip Bit)
 Evaluation: 16 -> 23 (0% from optimum) / 1 3 
 Local Search: Greedy + Hill Climbing + First Improvement (Interval Inversion)
-Evaluation: 16 -> 16 (0.3% from optimum) / 0 1 
+Evaluation: 16 -> 23 (0% from optimum) / 1 3 
 
 Local Search: Greedy + Hill Climbing + Best Improvement (Interval Inversion)
 Evaluation: 16 -> 23 (0% from optimum) / 1 3 
@@ -38,10 +38,10 @@ Meta Heuristic: Greedy + Simulated Annealing (Interval Inversion)
 Evaluation: 16 -> 23 (0% from optimum) / 1 3 
 ----------------------------------------------------------------------------------------------------
 Constructive Method: Greedy Randomized
-Evaluation: 16 (0.3% from optimum) / 0 1 
+Evaluation: 16 (30% from optimum) / 0 1 
 
 Local Search: Greedy Randomized + Hill Climbing + First Improvement (2 Flip Bit)
-Evaluation: 16 -> 16 (0.3% from optimum) / 0 1 
+Evaluation: 16 -> 23 (0% from optimum) / 1 3 
 
 Local Search: Greedy Randomized + Hill Climbing + Best Improvement (2 Flip Bit)
 Evaluation: 16 -> 23 (0% from optimum) / 1 3 
@@ -52,18 +52,18 @@ Evaluation: 16 -> 23 (0% from optimum) / 1 3
 Meta Heuristic: Greedy Randomized + Simulated Annealing (2 Flip Bit)
 Evaluation: 16 -> 23 (0% from optimum) / 1 3 
 Local Search: Greedy Randomized + Hill Climbing + First Improvement (Interval Flip Bit)
-Evaluation: 16 -> 16 (0.3% from optimum) / 0 1 
+Evaluation: 16 -> 23 (0% from optimum) / 1 3 
 
 Local Search: Greedy Randomized + Hill Climbing + Best Improvement (Interval Flip Bit)
 Evaluation: 16 -> 23 (0% from optimum) / 1 3 
 
 Local Search: Greedy Randomized + Random Descent + Random Selection (Interval Flip Bit)
-Evaluation: 16 -> 23 (0% from optimum) / 1 3 
+Evaluation: 16 -> 22 (4.3% from optimum) / 1 2 
 
 Meta Heuristic: Greedy Randomized + Simulated Annealing (Interval Flip Bit)
 Evaluation: 16 -> 23 (0% from optimum) / 1 3 
 Local Search: Greedy Randomized + Hill Climbing + First Improvement (Interval Inversion)
-Evaluation: 16 -> 16 (0.3% from optimum) / 0 1 
+Evaluation: 16 -> 23 (0% from optimum) / 1 3 
 
 Local Search: Greedy Randomized + Hill Climbing + Best Improvement (Interval Inversion)
 Evaluation: 16 -> 23 (0% from optimum) / 1 3 
@@ -75,39 +75,39 @@ Meta Heuristic: Greedy Randomized + Simulated Annealing (Interval Inversion)
 Evaluation: 16 -> 23 (0% from optimum) / 1 3 
 ----------------------------------------------------------------------------------------------------
 Constructive Method: Random
-Evaluation: 19 (0.17% from optimum) / 0 3 
+Evaluation: 18 (22% from optimum) / 0 2 
 
 Local Search: Random + Hill Climbing + First Improvement (2 Flip Bit)
-Evaluation: 19 -> 19 (0.17% from optimum) / 0 3 
+Evaluation: 18 -> 23 (0% from optimum) / 1 3 
 
 Local Search: Random + Hill Climbing + Best Improvement (2 Flip Bit)
-Evaluation: 19 -> 23 (0% from optimum) / 1 3 
+Evaluation: 18 -> 23 (0% from optimum) / 1 3 
 
 Local Search: Random + Random Descent + Random Selection (2 Flip Bit)
-Evaluation: 19 -> 23 (0% from optimum) / 1 3 
+Evaluation: 18 -> 23 (0% from optimum) / 1 3 
 
 Meta Heuristic: Random + Simulated Annealing (2 Flip Bit)
-Evaluation: 19 -> 23 (0% from optimum) / 1 3 
+Evaluation: 18 -> 23 (0% from optimum) / 1 3 
 Local Search: Random + Hill Climbing + First Improvement (Interval Flip Bit)
-Evaluation: 19 -> 19 (0.17% from optimum) / 0 3 
+Evaluation: 18 -> 23 (0% from optimum) / 1 3 
 
 Local Search: Random + Hill Climbing + Best Improvement (Interval Flip Bit)
-Evaluation: 19 -> 23 (0% from optimum) / 1 3 
+Evaluation: 18 -> 23 (0% from optimum) / 1 3 
 
 Local Search: Random + Random Descent + Random Selection (Interval Flip Bit)
-Evaluation: 19 -> 23 (0% from optimum) / 1 3 
+Evaluation: 18 -> 23 (0% from optimum) / 1 3 
 
 Meta Heuristic: Random + Simulated Annealing (Interval Flip Bit)
-Evaluation: 19 -> 23 (0% from optimum) / 1 3 
+Evaluation: 18 -> 23 (0% from optimum) / 1 3 
 Local Search: Random + Hill Climbing + First Improvement (Interval Inversion)
-Evaluation: 19 -> 19 (0.17% from optimum) / 0 3 
+Evaluation: 18 -> 23 (0% from optimum) / 1 3 
 
 Local Search: Random + Hill Climbing + Best Improvement (Interval Inversion)
-Evaluation: 19 -> 23 (0% from optimum) / 1 3 
+Evaluation: 18 -> 23 (0% from optimum) / 1 3 
 
 Local Search: Random + Random Descent + Random Selection (Interval Inversion)
-Evaluation: 19 -> 23 (0% from optimum) / 1 3 
+Evaluation: 18 -> 23 (0% from optimum) / 1 3 
 
 Meta Heuristic: Random + Simulated Annealing (Interval Inversion)
-Evaluation: 19 -> 23 (0% from optimum) / 1 3 
+Evaluation: 18 -> 23 (0% from optimum) / 1 3 
 ----------------------------------------------------------------------------------------------------

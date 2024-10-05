@@ -77,25 +77,40 @@ public:
 class Knapsack2FlipBitMovementGenerator : public KnapsackMovementGenerator {
 private:
     int n;
+    int curr_i, curr_j;
 public:
     Knapsack2FlipBitMovementGenerator(KnapsackEvaluator *evl, int n);
-    std::vector<Movement<KnapsackSolution>*> generate(const KnapsackSolution &s) override;
+    std::vector<Movement<KnapsackSolution>*> get_all(const KnapsackSolution &s) override;
+    Movement<KnapsackSolution>* get_random() override;
+    bool has_next() override;
+    Movement<KnapsackSolution>* next() override;
+    void reset() override;
 };
 
 class KnapsackIntervalFlipBitMovementGenerator : public KnapsackMovementGenerator {
 private:
     int n;
+    int curr_i, curr_j;
 public:
     KnapsackIntervalFlipBitMovementGenerator(KnapsackEvaluator *evl, int n);
-    std::vector<Movement<KnapsackSolution>*> generate(const KnapsackSolution &s) override;
+    std::vector<Movement<KnapsackSolution>*> get_all(const KnapsackSolution &s) override;
+    Movement<KnapsackSolution>* get_random() override;
+    bool has_next() override;
+    Movement<KnapsackSolution>* next() override;
+    void reset() override;
 };
 
 class KnapsackInversionMovementGenerator : public KnapsackMovementGenerator {
 private:
     int n;
+    int curr_i, curr_j;
 public:
     KnapsackInversionMovementGenerator(KnapsackEvaluator *evl, int n);
-    std::vector<Movement<KnapsackSolution>*> generate(const KnapsackSolution &s) override;
+    std::vector<Movement<KnapsackSolution>*> get_all(const KnapsackSolution &s) override;
+    Movement<KnapsackSolution>* get_random() override;
+    bool has_next() override;
+    Movement<KnapsackSolution>* next() override;
+    void reset() override;
 };
 
 KnapsackSolution cm_knapsack_greedy(const KnapsackEvaluator *evl);

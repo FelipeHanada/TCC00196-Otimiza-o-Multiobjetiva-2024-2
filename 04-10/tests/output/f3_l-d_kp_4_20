@@ -75,39 +75,39 @@ Meta Heuristic: Greedy Randomized + Simulated Annealing (Interval Inversion)
 Evaluation: 35 -> 35 (0% from optimum) / 0 1 3 
 ----------------------------------------------------------------------------------------------------
 Constructive Method: Random
-Evaluation: 35 (0% from optimum) / 0 1 3 
+Evaluation: 28 (20% from optimum) / 2 3 
 
 Local Search: Random + Hill Climbing + First Improvement (2 Flip Bit)
-Evaluation: 35 -> 35 (0% from optimum) / 0 1 3 
+Evaluation: 28 -> 28 (20% from optimum) / 2 3 
 
 Local Search: Random + Hill Climbing + Best Improvement (2 Flip Bit)
-Evaluation: 35 -> 35 (0% from optimum) / 0 1 3 
+Evaluation: 28 -> 28 (20% from optimum) / 2 3 
 
 Local Search: Random + Random Descent + Random Selection (2 Flip Bit)
-Evaluation: 35 -> 35 (0% from optimum) / 0 1 3 
+Evaluation: 28 -> 28 (20% from optimum) / 2 3 
 
 Meta Heuristic: Random + Simulated Annealing (2 Flip Bit)
-Evaluation: 35 -> 35 (0% from optimum) / 0 1 3 
+Evaluation: 28 -> 28 (20% from optimum) / 2 3 
 Local Search: Random + Hill Climbing + First Improvement (Interval Flip Bit)
-Evaluation: 35 -> 35 (0% from optimum) / 0 1 3 
+Evaluation: 28 -> 35 (0% from optimum) / 0 1 3 
 
 Local Search: Random + Hill Climbing + Best Improvement (Interval Flip Bit)
-Evaluation: 35 -> 35 (0% from optimum) / 0 1 3 
+Evaluation: 28 -> 35 (0% from optimum) / 0 1 3 
 
 Local Search: Random + Random Descent + Random Selection (Interval Flip Bit)
-Evaluation: 35 -> 35 (0% from optimum) / 0 1 3 
+Evaluation: 28 -> 28 (20% from optimum) / 2 3 
 
 Meta Heuristic: Random + Simulated Annealing (Interval Flip Bit)
-Evaluation: 35 -> 35 (0% from optimum) / 0 1 3 
+Evaluation: 28 -> 35 (0% from optimum) / 0 1 3 
 Local Search: Random + Hill Climbing + First Improvement (Interval Inversion)
-Evaluation: 35 -> 35 (0% from optimum) / 0 1 3 
+Evaluation: 28 -> 28 (20% from optimum) / 2 3 
 
 Local Search: Random + Hill Climbing + Best Improvement (Interval Inversion)
-Evaluation: 35 -> 35 (0% from optimum) / 0 1 3 
+Evaluation: 28 -> 28 (20% from optimum) / 2 3 
 
 Local Search: Random + Random Descent + Random Selection (Interval Inversion)
-Evaluation: 35 -> 35 (0% from optimum) / 0 1 3 
+Evaluation: 28 -> 28 (20% from optimum) / 2 3 
 
 Meta Heuristic: Random + Simulated Annealing (Interval Inversion)
-Evaluation: 35 -> 35 (0% from optimum) / 0 1 3 
+Evaluation: 28 -> 28 (20% from optimum) / 2 3 
 ----------------------------------------------------------------------------------------------------

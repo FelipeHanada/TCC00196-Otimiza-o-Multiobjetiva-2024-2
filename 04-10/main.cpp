@@ -32,7 +32,7 @@ void print_solution(
     os << evl_s1;
     if (optimum != -1) {
         long long delta = optimum - evl_s1;
-        os << " (" << std::setprecision(2) << delta / (double) optimum << "% from optimum)";
+        os << " (" << std::setprecision(2) << (delta / (double) optimum * 100) << "% from optimum)";
         
     }
     
@@ -46,6 +46,10 @@ void print_solution(
 }
 
 void test_instance(std::string instance_name) {
+    if (instance_name.compare("f6_l-d_kp_10_60") == 0) {
+        std::cout << "instance name: " << instance_name << std::endl;
+    }
+
     std::ofstream test_output_file(TEST_OUTPUT_DIR + std::string("/") + instance_name);
     if (!test_output_file.is_open()) {
         std::cerr << "Error opening test output file: " << instance_name << std::endl;
@@ -89,8 +93,8 @@ void test_instance(std::string instance_name) {
 
     std::map<std::string, KnapsackSolution (*)(const KnapsackEvaluator *evl)> cms = {
         {"Greedy", [](const KnapsackEvaluator *evl) -> KnapsackSolution { return cm_knapsack_greedy(evl); }},
-        {"Random", [](const KnapsackEvaluator *evl) -> KnapsackSolution { return cm_knapsack_random(evl, 10); }},
-        {"Greedy Randomized", [](const KnapsackEvaluator *evl) -> KnapsackSolution { return cm_knapsack_greedy_randomized(evl, 10, 0.1); }}
+        {"Random", [](const KnapsackEvaluator *evl) -> KnapsackSolution { return cm_knapsack_random(evl, 99999); }},
+        {"Greedy Randomized", [](const KnapsackEvaluator *evl) -> KnapsackSolution { return cm_knapsack_greedy_randomized(evl, 99999, 0.1); }}
     };
 
     std::map<std::string, MovementGenerator<KnapsackSolution>*> mgs = {

@@ -50,7 +50,11 @@ template <typename SolutionClass>
 class MovementGenerator {
     static_assert(std::is_base_of<Solution, SolutionClass>::value, "SolutionClass must be a descendant of Solution");
 public:
-    virtual std::vector<Movement<SolutionClass>*> generate(const SolutionClass &s) = 0;
+    virtual std::vector<Movement<SolutionClass>*> get_all(const SolutionClass &s) = 0;
+    virtual Movement<SolutionClass>* get_random() = 0;
+    virtual bool has_next() = 0;
+    virtual Movement<SolutionClass>* next() = 0;
+    virtual void reset() = 0; 
 };
 
 #include "optimization.tpp"
