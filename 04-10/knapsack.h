@@ -1,7 +1,7 @@
 #ifndef KNAPSACK_H
 #define KNAPSACK_H
 
-#include "optimization.h"
+#include "optimization.hpp"
 #include <vector>
 #include <chrono>
 #include <algorithm>
@@ -13,18 +13,16 @@ class KnapsackEvaluator;
 
 class KnapsackSolution : public Solution {
 private:
-    mutable long long w;
     size_t n;
     bool *s;
 public:
+    mutable long long w;
     KnapsackSolution(int n);
-    KnapsackSolution(const KnapsackSolution &s);
+    Solution* clone() const override;
     size_t size() const;
     bool get(int i) const;
     void set(int i, bool x, KnapsackEvaluator *evl = nullptr);
     void flip(int i, KnapsackEvaluator *evl = nullptr);
-
-    friend class KnapsackEvaluator;
 };
 
 class KnapsackEvaluator : public Evaluator<KnapsackSolution> {
@@ -35,7 +33,8 @@ public:
     std::vector<int> v;  // item values
     std::vector<int> w;  // item weights
     KnapsackEvaluator(int n, long long q, std::vector<int> v, std::vector<int> w);
-    long long evaluate(const KnapsackSolution &s) const override;
+    long long evaluate(const KnapsackSolution *s) const override;
+    long long get_evaluation(const KnapsackSolution *s) const override;
 };
 
 class KnapsackMovement : public Movement<KnapsackSolution> {
@@ -49,7 +48,8 @@ private:
     int i, j;
 public:
     Knapsack2FlipBitMovement(KnapsackEvaluator *evl, int i, int j);
-    KnapsackSolution move(const KnapsackSolution &s) override;
+    void move(KnapsackSolution *s) override;
+    long long delta(const KnapsackSolution *s) const override;
 };
 
 class KnapsackIntervalFlipBitMovement : public KnapsackMovement {
@@ -57,7 +57,8 @@ private:
     int i, j;
 public:
     KnapsackIntervalFlipBitMovement(KnapsackEvaluator *evl, int i, int j);
-    KnapsackSolution move(const KnapsackSolution &s) override;
+    void move(KnapsackSolution *s) override;
+    long long delta(const KnapsackSolution *s) const override;
 };
 
 class KnapsackInversionMovement : public KnapsackMovement {
@@ -65,7 +66,8 @@ private:
     int i, j;
 public:
     KnapsackInversionMovement(KnapsackEvaluator *evl, int i, int j);
-    KnapsackSolution move(const KnapsackSolution &s) override;
+    void move(KnapsackSolution *s) override;
+    long long delta(const KnapsackSolution *s) const override;
 };
 
 class KnapsackMovementGenerator : public MovementGenerator<KnapsackSolution> {
@@ -113,10 +115,10 @@ public:
     void reset() override;
 };
 
-KnapsackSolution cm_knapsack_greedy(const KnapsackEvaluator *evl);
+KnapsackSolution* cm_knapsack_greedy(const KnapsackEvaluator *evl);
 
-KnapsackSolution cm_knapsack_random(const KnapsackEvaluator *evl, float t);
+KnapsackSolution* cm_knapsack_random(const KnapsackEvaluator *evl, float t);
 
-KnapsackSolution cm_knapsack_greedy_randomized(const KnapsackEvaluator *evl, float t, float a);
+KnapsackSolution* cm_knapsack_greedy_randomized(const KnapsackEvaluator *evl, float t, float a);
 
 #endif // KNAPSACK_H

@@ -2,7 +2,7 @@
 #define META_HEURISTICS_H
 
 #include <cmath>
-#include "optimization.h"
+#include "optimization.hpp"
 #include "neighborhood_exploration.h"
 
 template <typename SolutionClass>
@@ -12,7 +12,7 @@ protected:
     Evaluator<SolutionClass> *evl;
 public:
     MetaHeuristicAlgorithm(Evaluator<SolutionClass> *evl);
-    virtual SolutionClass run(const SolutionClass &s, double t) = 0;
+    virtual SolutionClass* run(const SolutionClass *s, double t) = 0;
 };
 
 template <typename SolutionClass>
@@ -33,8 +33,8 @@ public:
         double t_0,
         double t_min = 0.00001
     );
-    SolutionClass pre_heat(const SolutionClass &s, double &final_t);
-    SolutionClass run(const SolutionClass &s, double t) override;
+    SolutionClass* pre_heat(const SolutionClass *s, double &final_t);
+    SolutionClass* run(const SolutionClass *s, double t) override;
 };
 
 #include "meta_heuristics.tpp"

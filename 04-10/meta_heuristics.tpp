@@ -24,16 +24,14 @@ MHSimulatedAnnealing<SolutionClass>::MHSimulatedAnnealing(
 }
 
 template <class SolutionClass>
-SolutionClass MHSimulatedAnnealing<SolutionClass>::pre_heat(const SolutionClass &s, double & final_t) {
+SolutionClass* MHSimulatedAnnealing<SolutionClass>::pre_heat(const SolutionClass *s, double & final_t) {
     // TO IMPLEMENT
 }
 
 template <class SolutionClass>
-SolutionClass MHSimulatedAnnealing<SolutionClass>::run(const SolutionClass &s, double t) {
-    SolutionClass s_prime = s;
-    long long s_prime_value = this->evl->get_evaluation(s_prime);
-    SolutionClass s_curr = s;
-    long long s_curr_value = s_prime_value;
+SolutionClass* MHSimulatedAnnealing<SolutionClass>::run(const SolutionClass *s, double t) {
+    SolutionClass *s_prime = (SolutionClass*) s->clone();
+    SolutionClass *s_curr = (SolutionClass*) s->clone();
 
     double curr_t = this->t_0;
 
@@ -48,28 +46,25 @@ SolutionClass MHSimulatedAnnealing<SolutionClass>::run(const SolutionClass &s, d
             Movement<SolutionClass> *m = this->ne.get_movement(s_curr);
             if (m == NULL) break;
             
-            SolutionClass s1 = m->move(s_curr);
-            delete m;
-            
-            long long s1_value = this->evl->get_evaluation(s1);
-
-            long long delta = s1_value - s_curr_value;
-            if (delta > 0) {
+            long long delta = m->delta(s_curr);
+            if (delta > 0 || std::rand() / RAND_MAX < std::exp(delta / curr_t)) {
+                SolutionClass *s1 = (SolutionClass*) s_curr->clone();
+                delete s_curr;
+                m->move(s1);
                 s_curr = s1;
-                if (s1_value > s_prime_value) {
-                    s_prime = s1;
-                    s_prime_value = s1_value;
-                }
-            } else {
-                double x = std::rand() / RAND_MAX;
-                if (x < std::exp(-delta / curr_t)) {
-                    s_curr = s1;
+
+                if (this->evl->get_evaluation(s_curr) > this->evl->get_evaluation(s_prime)) {
+                    delete s_prime;
+                    s_prime = (SolutionClass*) s_curr->clone();
                 }
             }
+
+            delete m;
         }
 
         curr_t = this->a * curr_t;
     }
 
+    delete s_curr;
     return s_prime;
 }

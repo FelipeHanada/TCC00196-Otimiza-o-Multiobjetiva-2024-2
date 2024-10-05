@@ -1,4 +1,4 @@
-#include "optimization.h"
+#include "optimization.hpp"
 
 Solution::Solution() {
     this->evaluated = false;

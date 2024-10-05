@@ -11,12 +11,16 @@ KnapsackSolution::KnapsackSolution(int n)
         this->s[i] = false;
 }
 
-KnapsackSolution::KnapsackSolution(const KnapsackSolution &s)
-    : KnapsackSolution(s.n)
-{
-    this->w = s.w;
-    for (int i = 0; i < s.n; i++)
-        this->s[i] = s.s[i];
+Solution* KnapsackSolution::clone() const {
+    KnapsackSolution *s = new KnapsackSolution(this->n);
+    for (int i = 0; i < this->n; i++)
+        s->s[i] = this->s[i];
+    s->w = this->w;
+
+    if (this->is_evaluated())
+        s->set_evaluation(this->get_last_evaluation());
+    
+    return s;
 }
 
 size_t KnapsackSolution::size() const {
@@ -48,11 +52,6 @@ void KnapsackSolution::flip(int i, KnapsackEvaluator *evl) {
 
     this->w += delta_w;
     long long new_v = this->get_last_evaluation() + delta_v;
-    if (this->w > evl->q) {
-        new_v += KnapsackEvaluator::PUNISHMENT;
-    } else if (this->w - delta_w < evl->q) {
-        new_v -= KnapsackEvaluator::PUNISHMENT;
-    }
 
     this->set_evaluation(new_v);
 }
@@ -64,18 +63,24 @@ KnapsackEvaluator::KnapsackEvaluator(int n, long long q, std::vector<int> v, std
     this->w = w;
 }
 
-long long KnapsackEvaluator::evaluate(const KnapsackSolution &s) const {
+long long KnapsackEvaluator::evaluate(const KnapsackSolution *s) const {
     long long curr_weigh = 0;
     long long curr_value = 0;
     for (int i = 0; i < this->n; i++) {
-        if (s.get(i)) {
+        if (s->get(i)) {
             curr_value += this->v[i];
             curr_weigh += this->w[i];
         }
     }
-    s.w = curr_weigh;
-    if (curr_weigh > this->q) return KnapsackEvaluator::PUNISHMENT;
+    s->w = curr_weigh;
     return curr_value;
+}
+
+long long KnapsackEvaluator::get_evaluation(const KnapsackSolution *s) const {
+    long long evaluation = Evaluator<KnapsackSolution>::get_evaluation(s);
+    
+    if (s->w > this->q) return KnapsackEvaluator::PUNISHMENT;
+    else return evaluation;
 }
 
 KnapsackMovement::KnapsackMovement(KnapsackEvaluator *evl) : evl(evl) {}
@@ -91,18 +96,34 @@ Knapsack2FlipBitMovement::Knapsack2FlipBitMovement(KnapsackEvaluator *evl, int i
     this->j = j;
 }
 
-KnapsackSolution Knapsack2FlipBitMovement::move(const KnapsackSolution &s) {
-    KnapsackSolution s1(s);
-
+void Knapsack2FlipBitMovement::move(KnapsackSolution *s) {
     if (this->i == this->j) {
-        s1.flip(this->i, this->evl);
-        return s1;
+        s->flip(this->i, this->evl);
     } else {
-        s1.flip(this->i, this->evl);
-        s1.flip(this->j, this->evl);
+        s->flip(this->i, this->evl);
+        s->flip(this->j, this->evl);
+    }
+}
+
+long long Knapsack2FlipBitMovement::delta(const KnapsackSolution *s) const {
+    long long a = this->evl->get_evaluation(s);
+    
+    long long delta_v = 0;
+    long long total_w = s->w;
+
+    delta_v += ((s->get(this->i)) ? -1 : 1) * this->evl->v[this->i] ;
+    total_w += ((s->get(this->i)) ? -1 : 1) * this->evl->w[this->i];
+    
+    if (this->i != this->j) {
+        delta_v += ((s->get(this->j)) ? -1 : 1) * this->evl->v[this->j];
+        total_w += ((s->get(this->j)) ? -1 : 1) * this->evl->w[this->j];
     }
 
-    return s1;
+    if (total_w > this->evl->q) {
+        return KnapsackEvaluator::PUNISHMENT;
+    }
+
+    return delta_v;
 }
 
 KnapsackIntervalFlipBitMovement::KnapsackIntervalFlipBitMovement(KnapsackEvaluator *evl, int i, int j)
@@ -112,13 +133,27 @@ KnapsackIntervalFlipBitMovement::KnapsackIntervalFlipBitMovement(KnapsackEvaluat
     this->j = j;
 }
 
-KnapsackSolution KnapsackIntervalFlipBitMovement::move(const KnapsackSolution &s) {
-    KnapsackSolution s1(s);
+void KnapsackIntervalFlipBitMovement::move(KnapsackSolution *s) {
+    for (int k = this->i; k <= this->j; k++)
+        s->flip(k, this->evl);
+}
+
+long long KnapsackIntervalFlipBitMovement::delta(const KnapsackSolution *s) const {
+    long long a = this->evl->get_evaluation(s);
+    
+    long long delta_v = 0;
+    long long total_w = s->w;
+
     for (int k = this->i; k <= this->j; k++) {
-        s1.flip(k, this->evl);
+        delta_v += ((s->get(k)) ? -1 : 1) * this->evl->v[k];
+        total_w += ((s->get(k)) ? -1 : 1) * this->evl->w[k];
     }
 
-    return s1;
+    if (total_w > this->evl->q) {
+        return KnapsackEvaluator::PUNISHMENT;
+    }
+
+    return delta_v;
 }
 
 KnapsackInversionMovement::KnapsackInversionMovement(KnapsackEvaluator *evl, int i, int j)
@@ -128,14 +163,31 @@ KnapsackInversionMovement::KnapsackInversionMovement(KnapsackEvaluator *evl, int
     this->j = j;
 }
 
-KnapsackSolution KnapsackInversionMovement::move(const KnapsackSolution &s) {
-    KnapsackSolution s1(s);
+void KnapsackInversionMovement::move(KnapsackSolution *s) {
     for (int k = 0; k < (this->j - this->i + 1) / 2; k++) {
-        int a = this->i + k, b = this->j - k;
-        s1.flip(a, this->evl);
-        s1.flip(b, this->evl);
+        int a = this->i + k,
+            b = this->j - k;
+        s->flip(a, this->evl);
+        s->flip(b, this->evl);
     }
-    return s1;
+}
+
+long long KnapsackInversionMovement::delta(const KnapsackSolution *s) const {
+    long long a = this->evl->get_evaluation(s);
+    
+    long long delta_v = 0;
+    long long total_w = s->w;
+
+    for (int k = this->i; k <= this->j; k++) {
+        delta_v += ((s->get(k)) ? -1 : 1) * this->evl->v[k];
+        total_w += ((s->get(k)) ? -1 : 1) * this->evl->w[k];
+    }
+
+    if (total_w > this->evl->q) {
+        return KnapsackEvaluator::PUNISHMENT;
+    }
+
+    return delta_v;
 }
 
 Knapsack2FlipBitMovementGenerator::Knapsack2FlipBitMovementGenerator(KnapsackEvaluator *evl, int n)
@@ -270,9 +322,9 @@ void KnapsackInversionMovementGenerator::reset() {
     this->curr_j = 0;
 }
 
-KnapsackSolution cm_knapsack_greedy(const KnapsackEvaluator *evl) {
+KnapsackSolution* cm_knapsack_greedy(const KnapsackEvaluator *evl) {
     long long curr_Q = evl->q;
-    KnapsackSolution s(evl->n);
+    KnapsackSolution *s = new KnapsackSolution(evl->n);
 
     std::vector<int> c(evl->n);
     std::iota(c.begin(), c.end(), 0);
@@ -288,17 +340,17 @@ KnapsackSolution cm_knapsack_greedy(const KnapsackEvaluator *evl) {
         }
 
         curr_Q -= evl->w[g];
-        s.set(g, true);
+        s->set(g, true);
     }
 
     return s;
 }
 
-KnapsackSolution cm_knapsack_random(const KnapsackEvaluator *evl, float t) {
+KnapsackSolution* cm_knapsack_random(const KnapsackEvaluator *evl, float t) {
     auto start = std::chrono::high_resolution_clock::now();
 
     long long curr_Q = evl->q;
-    KnapsackSolution s(evl->n);
+    KnapsackSolution *s = new KnapsackSolution(evl->n);
 
     std::vector<int> c(evl->n);
     iota(c.begin(), c.end(), 0);
@@ -316,7 +368,7 @@ KnapsackSolution cm_knapsack_random(const KnapsackEvaluator *evl, float t) {
             break;
 
         auto g = c.begin() + (rand() % c.size());
-        s.set(*g, true);
+        s->set(*g, true);
         curr_Q -= evl->w[*g];
         c.erase(g);
 
@@ -328,10 +380,10 @@ KnapsackSolution cm_knapsack_random(const KnapsackEvaluator *evl, float t) {
     return s;
 }
 
-KnapsackSolution cm_knapsack_greedy_randomized(const KnapsackEvaluator *evl, float t, float a) {
+KnapsackSolution* cm_knapsack_greedy_randomized(const KnapsackEvaluator *evl, float t, float a) {
     auto start = std::chrono::high_resolution_clock::now();
 
-    KnapsackSolution s(evl->n);
+    KnapsackSolution *s = new KnapsackSolution(evl->n);
     long long curr_Q = evl->q;
 
     std::vector<float> values;
@@ -383,7 +435,7 @@ KnapsackSolution cm_knapsack_greedy_randomized(const KnapsackEvaluator *evl, flo
         int g = (rc_size == 0) ? c_value_ordered[0] : c_value_ordered[std::rand() % rc_size];
 
         curr_Q -= evl->w[g];
-        s.set(g, true);
+        s->set(g, true);
 
         c.erase(std::remove(c.begin(), c.end(), g), c.end());
         c_value_ordered.erase(std::remove(c_value_ordered.begin(), c_value_ordered.end(), g), c_value_ordered.end());

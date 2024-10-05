@@ -3,12 +3,12 @@
 #include <fstream>
 #include <filesystem>
 #include <vector>
-#include "optimization.h"
+#include "optimization.hpp"
 #include "knapsack.h"
 #include "neighborhood_exploration.h"
 #include "meta_heuristics.h"
 
-#define INSTANCE_DIR "./tests/instances-low_dimensional"
+#define INSTANCE_DIR "./tests/instances-low_dimensional_copy"
 #define OPTIMUM_DIR "./tests/optimum-low_dimensional"
 #define TEST_OUTPUT_DIR "./tests/output"
 
@@ -24,11 +24,10 @@ void print_solution(
 
     os << "Evaluation: ";
     if (s != nullptr) {
-        os << evl->get_evaluation(*s);
-        os << " -> ";
+        os << evl->get_evaluation(s) << " -> ";
     }
     
-    long long evl_s1 = evl->get_evaluation(*s1);
+    long long evl_s1 = evl->get_evaluation(s1);
     os << evl_s1;
     if (optimum != -1) {
         long long delta = optimum - evl_s1;
@@ -91,10 +90,10 @@ void test_instance(std::string instance_name) {
 
     KnapsackEvaluator evl(n, q, v, w);
 
-    std::map<std::string, KnapsackSolution (*)(const KnapsackEvaluator *evl)> cms = {
-        {"Greedy", [](const KnapsackEvaluator *evl) -> KnapsackSolution { return cm_knapsack_greedy(evl); }},
-        {"Random", [](const KnapsackEvaluator *evl) -> KnapsackSolution { return cm_knapsack_random(evl, 99999); }},
-        {"Greedy Randomized", [](const KnapsackEvaluator *evl) -> KnapsackSolution { return cm_knapsack_greedy_randomized(evl, 99999, 0.1); }}
+    std::map<std::string, KnapsackSolution* (*)(const KnapsackEvaluator *evl)> cms = {
+        {"Greedy", [](const KnapsackEvaluator *evl) -> KnapsackSolution* { return cm_knapsack_greedy(evl); }},
+        {"Random", [](const KnapsackEvaluator *evl) -> KnapsackSolution* { return cm_knapsack_random(evl, 99999); }},
+        {"Greedy Randomized", [](const KnapsackEvaluator *evl) -> KnapsackSolution* { return cm_knapsack_greedy_randomized(evl, 99999, 0.1); }}
     };
 
     std::map<std::string, MovementGenerator<KnapsackSolution>*> mgs = {
@@ -104,19 +103,20 @@ void test_instance(std::string instance_name) {
     };
 
     for (auto &cm : cms) {
-        KnapsackSolution s = cm.second(&evl);
-        print_solution("Constructive Method: " + cm.first, &evl, &s, NULL, optimum, test_output_file);
+        KnapsackSolution* s = cm.second(&evl);
+        print_solution("Constructive Method: " + cm.first, &evl, s, NULL, optimum, test_output_file);
         test_output_file << std::endl;
 
-        KnapsackSolution s1(0);
+        KnapsackSolution* s1;
         for (auto &mg : mgs) {
             RHFirstImprovement<KnapsackSolution> fi(&evl, mg.second);
             LSHillClimbing<KnapsackSolution> hill_climbing_fi(&evl, &fi);
-            s1 = hill_climbing_fi.run(s, 10);
+            s1 = hill_climbing_fi.run(s, 99999);
             print_solution(
                 "Local Search: " + cm.first + " + Hill Climbing + First Improvement (" + mg.first + ")",
-                &evl, &s1, &s, optimum, test_output_file
+                &evl, s1, s, optimum, test_output_file
             );
+            delete s1;
             test_output_file << std::endl;
 
             RHBestImprovement<KnapsackSolution> bi(&evl, mg.second);
@@ -124,8 +124,9 @@ void test_instance(std::string instance_name) {
             s1 = hill_climbing_bi.run(s, 10);
             print_solution(
                 "Local Search: " + cm.first + " + Hill Climbing + Best Improvement (" + mg.first + ")",
-                &evl, &s1, &s, optimum, test_output_file
+                &evl, s1, s, optimum, test_output_file
             );
+            delete s1;
             test_output_file << std::endl;
 
             RHRandomSelection<KnapsackSolution> rs(&evl, mg.second, 5);
@@ -133,8 +134,9 @@ void test_instance(std::string instance_name) {
             s1 = random_descent.run(s, 10);
             print_solution(
                 "Local Search: " + cm.first + " + Random Descent + Random Selection (" + mg.first + ")",
-                &evl, &s1, &s, optimum, test_output_file
+                &evl, s1, s, optimum, test_output_file
             );
+            delete s1;
             test_output_file << std::endl;
 
             MHSimulatedAnnealing<KnapsackSolution> simulated_annealing(
@@ -144,8 +146,9 @@ void test_instance(std::string instance_name) {
             s1 = simulated_annealing.run(s, 10);
             print_solution(
                 "Meta Heuristic: " + cm.first + " + Simulated Annealing (" + mg.first + ")",
-                &evl, &s1, &s, optimum, test_output_file
+                &evl, s1, s, optimum, test_output_file
             );
+            delete s1;
         }
 
         test_output_file << std::setw(100) << std::setfill('-') << "" << std::endl;
