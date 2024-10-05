@@ -178,13 +178,13 @@ long long KnapsackInversionMovement::delta(const KnapsackSolution *s) const {
     long long delta_v = 0;
     long long total_w = s->w;
 
-    for (int k = this->i; k <= this->j; k++) {
-        delta_v += ((s->get(k)) ? -1 : 1) * this->evl->v[k];
-        total_w += ((s->get(k)) ? -1 : 1) * this->evl->w[k];
-    }
-
-    if (total_w > this->evl->q) {
-        return KnapsackEvaluator::PUNISHMENT;
+    for (int k = 0; k < (this->j - this->i + 1) / 2; k++) {
+        int a = this->i + k,
+            b = this->j - k;
+        delta_v += ((s->get(a)) ? -1 : 1) * this->evl->v[a];
+        delta_v += ((s->get(b)) ? -1 : 1) * this->evl->v[b];
+        total_w += ((s->get(a)) ? -1 : 1) * this->evl->w[a];
+        total_w += ((s->get(b)) ? -1 : 1) * this->evl->w[b];
     }
 
     return delta_v;

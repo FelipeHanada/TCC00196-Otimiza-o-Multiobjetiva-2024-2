@@ -32,7 +32,6 @@ void print_solution(
     if (optimum != -1) {
         long long delta = optimum - evl_s1;
         os << " (" << std::setprecision(2) << (delta / (double) optimum * 100) << "% from optimum)";
-        
     }
     
     os << " / ";

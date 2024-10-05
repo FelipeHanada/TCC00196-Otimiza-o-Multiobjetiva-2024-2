@@ -13,20 +13,13 @@ NEFindAny<SolutionClass>::NEFindAny(Evaluator<SolutionClass> *evl, MovementGener
 template <class SolutionClass>
 Movement<SolutionClass>* NEFindAny<SolutionClass>::get_movement(const SolutionClass *s) {
     Movement<SolutionClass>* curr_m = NULL;
-    long long curr_value = this->evl->get_evaluation(s);
     
     for (int i = 0; i < this->k; i++) {
         Movement<SolutionClass> *m = this->mg->get_random();
 
-        SolutionClass *s1 = (SolutionClass*) s->clone();
-        m->move(s1);
-        long long s1_value = this->evl->get_evaluation(s1);
-        delete s1;
-
-        if (s1_value > curr_value) {
+        if (m->delta(s) > 0) {
             delete curr_m;
             curr_m = m;
-            curr_value = s1_value;
         } else {
             delete m;
         }
@@ -46,15 +39,7 @@ Movement<SolutionClass>* NEFindFirst<SolutionClass>::get_movement(const Solution
     this->mg->reset();
     while (this->mg->has_next()) {
         Movement<SolutionClass> *m = this->mg->next();
-
-        SolutionClass *s1 = (SolutionClass*) s->clone();
-        m->move(s1);
-        long long s1_value = this->evl->get_evaluation(s1);
-        delete s1;
-        
-        if (s1_value > value) {
-            return m;
-        }
+        if (m->delta(s) > 0) return m;
         delete m;
     }
 
@@ -75,14 +60,7 @@ Movement<SolutionClass>* NEFindNext<SolutionClass>::get_movement(const SolutionC
     while (this->mg->has_next()) {
         Movement<SolutionClass> *m = this->mg->next();
         
-        SolutionClass *s1 = (SolutionClass*) s->clone();
-        m->move(s1);
-        long long s1_value = this->evl->get_evaluation(s1);
-        delete s1;
-        
-        if (s1_value > value) {
-            return m;
-        }
+        if (m->delta(s) > 0) return m;
         delete m;
     }
 
@@ -98,19 +76,15 @@ Movement<SolutionClass>* NEFindBest<SolutionClass>::get_movement(const SolutionC
     this->mg->reset();
 
     Movement<SolutionClass>* curr_m = NULL;
-    long long curr_value = this->evl->get_evaluation(s);
+    long long delta_prime = 0;
     while (this->mg->has_next()) {
         Movement<SolutionClass> *m = this->mg->next();
 
-        SolutionClass *s1 = (SolutionClass*) s->clone();
-        m->move(s1);
-        long long s1_value = this->evl->get_evaluation(s1);
-        delete s1;
-        
-        if (s1_value > curr_value) {
+        long long delta = m->delta(s);
+        if (delta > delta_prime) {
             delete curr_m;
             curr_m = m;
-            curr_value = s1_value;
+            delta_prime = delta;
         } else {
             delete m;
         }
