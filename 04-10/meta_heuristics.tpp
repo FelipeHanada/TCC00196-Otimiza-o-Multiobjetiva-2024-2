@@ -10,32 +10,32 @@ MHSimulatedAnnealing<SolutionClass>::MHSimulatedAnnealing(
     Evaluator<SolutionClass> *evl,
     MovementGenerator<SolutionClass> *mg,
     int SA_max,
-    double a,
-    double b,
-    double g,
+    double alpha,
+    double beta,
+    double gamma,
     double t_min
 )
     : MetaHeuristicAlgorithm<SolutionClass>(evl)
 {
-    if (a <= 0 || a >= 1)
-        throw std::invalid_argument("Parameter 'a' must be greater than 0 and less than 1.");
+    if (alpha <= 0 || alpha >= 1)
+        throw std::invalid_argument("Parameter 'alpha' must be greater than 0 and less than 1.");
 
-    if (b <= 1)
-        throw std::invalid_argument("Parameter 'b' must be greater than 1.");
+    if (beta <= 1)
+        throw std::invalid_argument("Parameter 'beta' must be greater than 1.");
 
-    if (g <= 0 || g >= 1)
-        throw std::invalid_argument("Parameter 'g' must be greater than 0 and less than 1.");
+    if (gamma <= 0 || gamma >= 1)
+        throw std::invalid_argument("Parameter 'gamma' must be greater than 0 and less than 1.");
 
     this->mg = mg;
     this->SA_max = SA_max;
-    this->a = a;
-    this->b = b;
-    this->g = g;
+    this->alpha = alpha;
+    this->beta = beta;
+    this->gamma = gamma;
     this->t_min = t_min;
 }
 
 template <class SolutionClass>
-double MHSimulatedAnnealing<SolutionClass>::initial_temperature(const SolutionClass *s, double b, double g) {
+double MHSimulatedAnnealing<SolutionClass>::initial_temperature(const SolutionClass *s) {
     double curr_t = this->t_min;
 
     while (true) {
@@ -50,10 +50,10 @@ double MHSimulatedAnnealing<SolutionClass>::initial_temperature(const SolutionCl
             }
         }        
 
-        if (curr_accepted > this->SA_max * g)
+        if (curr_accepted > this->SA_max * gamma)
             break;
 
-        curr_t = b * curr_t;
+        curr_t = beta * curr_t;
     }
 
     return curr_t;
@@ -64,7 +64,7 @@ SolutionClass* MHSimulatedAnnealing<SolutionClass>::run(const SolutionClass *s, 
     SolutionClass *s_prime = (SolutionClass*) s->clone();
     SolutionClass *s_curr = (SolutionClass*) s->clone();
 
-    double curr_t = this->initial_temperature(s, this->b, this->g);
+    double curr_t = this->initial_temperature(s, this->beta, this->gamma);
 
     auto start = std::chrono::high_resolution_clock::now();
     auto current = std::chrono::high_resolution_clock::now();
@@ -93,9 +93,51 @@ SolutionClass* MHSimulatedAnnealing<SolutionClass>::run(const SolutionClass *s, 
             delete m;
         }
 
-        curr_t = this->a * curr_t;
+        curr_t = this->alpha * curr_t;
     }
 
     delete s_curr;
+    return s_prime;
+}
+
+template <class SolutionClass>
+MHGrasp<SolutionClass>::MHGrasp(
+    Evaluator<SolutionClass> *evl,
+    MovementGenerator<SolutionClass> *mg,
+    std::function<SolutionClass*(Evaluator<SolutionClass>, double)> constructive_method,
+    double alpha,
+    LocalSearch<SolutionClass> *ls,
+    int GRASP_max
+)
+    : MetaHeuristicAlgorithm<SolutionClass>(evl)
+{
+    this->mg = mg;
+    this->constructive_method = constructive_method;
+    this->alpha = alpha;
+    this->ls = ls;
+    this->GRASP_max = GRASP_max;
+}
+
+template <class SolutionClass>
+SolutionClass* MHGrasp<SolutionClass>::run(const SolutionClass *s, double t) {
+    SolutionClass *s_prime = (SolutionClass*) s->clone();
+
+    auto start = std::chrono::high_resolution_clock::now();
+    for (int i=0; i<this->GRASP_max; i++) {
+        auto current = std::chrono::high_resolution_clock::now();
+        if (std::chrono::duration<float>(current - start).count() >= t) break;
+
+        SolutionClass *s_curr = this->constructive_method(this->evl, this->alpha);
+        SolutionClass *s1 = this->ls->run(s_curr, t);
+        delete s_curr;
+
+        if (this->evl->get_evaluation(s1) > this->evl->get_evaluation(s_prime)) {
+            delete s_prime;
+            s_prime = s1;
+        } else {
+            delete s1;
+        }
+    }
+
     return s_prime;
 }

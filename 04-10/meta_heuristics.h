@@ -5,7 +5,7 @@
 #include "optimization.hpp"
 #include "neighborhood_exploration.h"
 
-template <typename SolutionClass>
+template <class SolutionClass>
 class MetaHeuristicAlgorithm {
     static_assert(std::is_base_of<Solution, SolutionClass>::value, "SolutionClass must be a descendant of Solution");
 protected:
@@ -15,9 +15,10 @@ public:
     virtual SolutionClass* run(const SolutionClass *s, double t) = 0;
 };
 
-template <typename SolutionClass>
+template <class SolutionClass>
 class MHSimulatedAnnealing : public MetaHeuristicAlgorithm<SolutionClass> {
     static_assert(std::is_base_of<Solution, SolutionClass>::value, "SolutionClass must be a descendant of Solution");
+private:
     MovementGenerator<SolutionClass> *mg;
     int SA_max;
     double a;
@@ -29,12 +30,33 @@ public:
         Evaluator<SolutionClass> *evl,
         MovementGenerator<SolutionClass> *mg,
         int SA_max,
-        double a = 0.95,
-        double b = 1.05,
-        double g = 0.9,
+        double alpha = 0.95,
+        double beta = 1.05,
+        double gamma = 0.9,
         double t_min = 0.00001
     );
-    double initial_temperature(const SolutionClass *s, double b, double g);
+    double initial_temperature(const SolutionClass *s);
+    SolutionClass* run(const SolutionClass *s, double t) override;
+};
+
+template <class SolutionClass>
+class MHGrasp : public MetaHeuristicAlgorithm<SolutionClass> {
+    static_assert(std::is_base_of<Solution, SolutionClass>::value, "SolutionClass must be a descendant of Solution");
+private:
+    MovementGenerator<SolutionClass> *mg;
+    std::function<SolutionClass*(Evaluator<SolutionClass>, double)> constructive_method;
+    double alpha;
+    LocalSearch<SolutionClass> *ls;
+    int GRASP_max;
+public:
+    MHGrasp(
+        Evaluator<SolutionClass> *evl,
+        MovementGenerator<SolutionClass> *mg,
+        std::function<SolutionClass*(Evaluator<SolutionClass>, double)> constructive_method,
+        double alpha,
+        LocalSearch<SolutionClass> *ls,
+        int GRASP_max
+    );
     SolutionClass* run(const SolutionClass *s, double t) override;
 };
 

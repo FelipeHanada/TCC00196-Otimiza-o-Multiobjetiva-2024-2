@@ -6,7 +6,7 @@
 #include <optional>
 #include <type_traits>
 
-template <typename SolutionClass>
+template <class SolutionClass>
 class Evaluator;
 
 class Solution {
@@ -22,13 +22,13 @@ protected:
 public:
     Solution();
     virtual Solution* clone() const = 0;
-    template <typename SolutionClass>
+    template <class SolutionClass>
     friend class Evaluator;
-    template <typename SolutionClass>
+    template <class SolutionClass>
     friend class Movement;
 };
 
-template <typename SolutionClass>
+template <class SolutionClass>
 class Evaluator {
     static_assert(std::is_base_of<Solution, SolutionClass>::value, "SolutionClass must be a descendant of Solution");
 protected:
@@ -37,7 +37,7 @@ public:
     virtual long long get_evaluation(const SolutionClass *s) const;
 };
 
-template <typename SolutionClass>
+template <class SolutionClass>
 class Movement {
     static_assert(std::is_base_of<Solution, SolutionClass>::value, "SolutionClass must be a descendant of Solution");
 public:
@@ -45,7 +45,7 @@ public:
     virtual long long delta(const SolutionClass *s) const = 0;
 };
 
-template <typename SolutionClass>
+template <class SolutionClass>
 class MovementGenerator {
     static_assert(std::is_base_of<Solution, SolutionClass>::value, "SolutionClass must be a descendant of Solution");
 public:
