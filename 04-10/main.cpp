@@ -8,7 +8,7 @@
 #include "neighborhood_exploration.h"
 #include "meta_heuristics.h"
 
-#define INSTANCE_DIR "./tests/instances-low_dimensional_copy"
+#define INSTANCE_DIR "./tests/instances-low_dimensional"
 #define OPTIMUM_DIR "./tests/optimum-low_dimensional"
 #define TEST_OUTPUT_DIR "./tests/output"
 
@@ -44,9 +44,7 @@ void print_solution(
 }
 
 void test_instance(std::string instance_name) {
-    if (instance_name.compare("f6_l-d_kp_10_60") == 0) {
-        std::cout << "instance name: " << instance_name << std::endl;
-    }
+    std::cout << "Testing instance: " << instance_name << std::endl;
 
     std::ofstream test_output_file(TEST_OUTPUT_DIR + std::string("/") + instance_name + std::string(".txt"));
     if (!test_output_file.is_open()) {
@@ -140,7 +138,7 @@ void test_instance(std::string instance_name) {
 
             MHSimulatedAnnealing<KnapsackSolution> simulated_annealing(
                 &evl, mg.second, 100,
-                0.95, 100000, 0.00001
+                0.95, 1.05, 0.9, 0.00001
             );
             s1 = simulated_annealing.run(s, 10);
             print_solution(
@@ -148,6 +146,7 @@ void test_instance(std::string instance_name) {
                 &evl, s1, s, optimum, test_output_file
             );
             delete s1;
+            test_output_file << std::endl;
         }
 
         test_output_file << std::setw(100) << std::setfill('-') << "" << std::endl;

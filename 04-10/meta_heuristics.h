@@ -18,22 +18,23 @@ public:
 template <typename SolutionClass>
 class MHSimulatedAnnealing : public MetaHeuristicAlgorithm<SolutionClass> {
     static_assert(std::is_base_of<Solution, SolutionClass>::value, "SolutionClass must be a descendant of Solution");
-    NEFindAny<SolutionClass> ne;
     MovementGenerator<SolutionClass> *mg;
     int SA_max;
-    double t_0;
-    double t_min;
     double a;
+    double b;
+    double g;
+    double t_min;
 public:
     MHSimulatedAnnealing(
         Evaluator<SolutionClass> *evl,
         MovementGenerator<SolutionClass> *mg,
         int SA_max,
-        double a,
-        double t_0,
+        double a = 0.95,
+        double b = 1.05,
+        double g = 0.9,
         double t_min = 0.00001
     );
-    SolutionClass* pre_heat(const SolutionClass *s, double &final_t);
+    double initial_temperature(const SolutionClass *s, double b, double g);
     SolutionClass* run(const SolutionClass *s, double t) override;
 };
 
