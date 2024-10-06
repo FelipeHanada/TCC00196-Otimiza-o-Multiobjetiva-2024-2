@@ -48,7 +48,7 @@ void test_instance(std::string instance_name) {
         std::cout << "instance name: " << instance_name << std::endl;
     }
 
-    std::ofstream test_output_file(TEST_OUTPUT_DIR + std::string("/") + instance_name);
+    std::ofstream test_output_file(TEST_OUTPUT_DIR + std::string("/") + instance_name + std::string(".txt"));
     if (!test_output_file.is_open()) {
         std::cerr << "Error opening test output file: " << instance_name << std::endl;
         return;

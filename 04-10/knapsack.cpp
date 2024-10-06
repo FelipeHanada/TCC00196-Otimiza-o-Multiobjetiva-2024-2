@@ -187,6 +187,10 @@ long long KnapsackInversionMovement::delta(const KnapsackSolution *s) const {
         total_w += ((s->get(b)) ? -1 : 1) * this->evl->w[b];
     }
 
+    if (total_w > this->evl->q) {
+        return KnapsackEvaluator::PUNISHMENT;
+    }
+
     return delta_v;
 }
 
