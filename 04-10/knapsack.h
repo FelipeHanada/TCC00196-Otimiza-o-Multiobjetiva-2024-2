@@ -115,10 +115,10 @@ public:
     void reset() override;
 };
 
-KnapsackSolution* cm_knapsack_greedy(const KnapsackEvaluator *evl);
+KnapsackSolution* cm_knapsack_greedy(const KnapsackEvaluator *evl, double t);
 
-KnapsackSolution* cm_knapsack_random(const KnapsackEvaluator *evl, float t);
+KnapsackSolution* cm_knapsack_random(const KnapsackEvaluator *evl, double t);
 
-KnapsackSolution* cm_knapsack_greedy_randomized(const KnapsackEvaluator *evl, float t, float a);
+KnapsackSolution* cm_knapsack_greedy_randomized(const KnapsackEvaluator *evl, float a, double t);
 
 #endif // KNAPSACK_H

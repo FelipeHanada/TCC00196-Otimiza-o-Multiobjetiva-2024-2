@@ -81,80 +81,50 @@ void test_instance(std::string instance_name) {
     }
 
     if (optimum != -1) {
-        test_output_file << "Optimum: " << optimum << std::endl;
+        test_output_file << "Optimum: " << optimum << std::endl
+            << std::endl;
         test_output_file << std::setw(100) << std::setfill('-') << "" << std::endl;
     }
 
     KnapsackEvaluator evl(n, q, v, w);
+    MovementGenerator<KnapsackSolution> *mg = new KnapsackInversionMovementGenerator(&evl, n);
 
-    std::map<std::string, KnapsackSolution* (*)(const KnapsackEvaluator *evl)> cms = {
-        {"Greedy", [](const KnapsackEvaluator *evl) -> KnapsackSolution* { return cm_knapsack_greedy(evl); }},
-        {"Random", [](const KnapsackEvaluator *evl) -> KnapsackSolution* { return cm_knapsack_random(evl, 99999); }},
-        {"Greedy Randomized", [](const KnapsackEvaluator *evl) -> KnapsackSolution* { return cm_knapsack_greedy_randomized(evl, 99999, 0.1); }}
-    };
+    KnapsackSolution* s1;
 
-    std::map<std::string, MovementGenerator<KnapsackSolution>*> mgs = {
-        {"2 Flip Bit", new Knapsack2FlipBitMovementGenerator(&evl, n)},
-        {"Interval Flip Bit", new KnapsackIntervalFlipBitMovementGenerator(&evl, n)},
-        {"Interval Inversion", new KnapsackInversionMovementGenerator(&evl, n)}
-    };
+    RHRandomSelection<KnapsackSolution> rs(&evl, mg, 10000);
+    LSHillClimbing<KnapsackSolution> hill_climbing(&evl, &rs);
+    MHGrasp<KnapsackSolution> grasp(&evl,
+        [](Evaluator<KnapsackSolution> *evl, double alpha) -> KnapsackSolution* {
+            return cm_knapsack_greedy_randomized((KnapsackEvaluator*) evl, alpha, 5); 
+        },
+        0.5, &hill_climbing, 1000
+    );
+    s1 = grasp.run(600);
+    print_solution(
+        "Meta Heuristic: GRASP",
+        &evl, s1, NULL, optimum, test_output_file
+    );
+    delete s1;
+    test_output_file << std::endl;
 
-    for (auto &cm : cms) {
-        KnapsackSolution* s = cm.second(&evl);
-        print_solution("Constructive Method: " + cm.first, &evl, s, NULL, optimum, test_output_file);
-        test_output_file << std::endl;
+    test_output_file << std::setw(100) << std::setfill('-') << "" << std::endl;
 
-        KnapsackSolution* s1;
-        for (auto &mg : mgs) {
-            RHFirstImprovement<KnapsackSolution> fi(&evl, mg.second);
-            LSHillClimbing<KnapsackSolution> hill_climbing_fi(&evl, &fi);
-            s1 = hill_climbing_fi.run(s, 99999);
-            print_solution(
-                "Local Search: " + cm.first + " + Hill Climbing + First Improvement (" + mg.first + ")",
-                &evl, s1, s, optimum, test_output_file
-            );
-            delete s1;
-            test_output_file << std::endl;
+    KnapsackSolution* s = cm_knapsack_greedy_randomized(&evl, 0.9, 99999);
+    print_solution("Constructive Method: Greedy Randomized", &evl, s, NULL, optimum, test_output_file);
+    test_output_file << std::endl;
+    MHSimulatedAnnealing<KnapsackSolution> simulated_annealing(
+        &evl, mg, s, 100000,
+        0.95, 1.05, 0.9, 0.00001
+    );
+    s1 = simulated_annealing.run(600);
+    print_solution(
+        "Meta Heuristic: Simulated Annealing",
+        &evl, s1, s, optimum, test_output_file
+    );
+    delete s1;
+    test_output_file << std::endl;
 
-            RHBestImprovement<KnapsackSolution> bi(&evl, mg.second);
-            LSHillClimbing<KnapsackSolution> hill_climbing_bi(&evl, &bi);
-            s1 = hill_climbing_bi.run(s, 10);
-            print_solution(
-                "Local Search: " + cm.first + " + Hill Climbing + Best Improvement (" + mg.first + ")",
-                &evl, s1, s, optimum, test_output_file
-            );
-            delete s1;
-            test_output_file << std::endl;
-
-            RHRandomSelection<KnapsackSolution> rs(&evl, mg.second, 5);
-            RandomDescentMethod<KnapsackSolution> random_descent(&evl, &rs, 10);
-            s1 = random_descent.run(s, 10);
-            print_solution(
-                "Local Search: " + cm.first + " + Random Descent + Random Selection (" + mg.first + ")",
-                &evl, s1, s, optimum, test_output_file
-            );
-            delete s1;
-            test_output_file << std::endl;
-
-            MHSimulatedAnnealing<KnapsackSolution> simulated_annealing(
-                &evl, mg.second, 100,
-                0.95, 1.05, 0.9, 0.00001
-            );
-            s1 = simulated_annealing.run(s, 10);
-            print_solution(
-                "Meta Heuristic: " + cm.first + " + Simulated Annealing (" + mg.first + ")",
-                &evl, s1, s, optimum, test_output_file
-            );
-            delete s1;
-            test_output_file << std::endl;
-        }
-
-        test_output_file << std::setw(100) << std::setfill('-') << "" << std::endl;
-    }
-
-    for (auto &mg : mgs)
-        delete mg.second;
-
+    delete mg;
     test_output_file.close();
 }
 

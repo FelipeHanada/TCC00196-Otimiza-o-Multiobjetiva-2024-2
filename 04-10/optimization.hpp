@@ -2,8 +2,6 @@
 #define OPTIMIZATION_H
 
 #include <vector>
-#include <map>
-#include <optional>
 #include <type_traits>
 
 template <class SolutionClass>

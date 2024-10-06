@@ -9,6 +9,7 @@ template <class SolutionClass>
 MHSimulatedAnnealing<SolutionClass>::MHSimulatedAnnealing(
     Evaluator<SolutionClass> *evl,
     MovementGenerator<SolutionClass> *mg,
+    SolutionClass *s_0,
     int SA_max,
     double alpha,
     double beta,
@@ -27,6 +28,7 @@ MHSimulatedAnnealing<SolutionClass>::MHSimulatedAnnealing(
         throw std::invalid_argument("Parameter 'gamma' must be greater than 0 and less than 1.");
 
     this->mg = mg;
+    this->s_0 = s_0;
     this->SA_max = SA_max;
     this->alpha = alpha;
     this->beta = beta;
@@ -45,40 +47,46 @@ double MHSimulatedAnnealing<SolutionClass>::initial_temperature(const SolutionCl
             Movement<SolutionClass> *m = this->mg->get_random();
 
             long long delta = m->delta(s);
-            if (delta > 0 || std::rand() / RAND_MAX < std::exp(delta / curr_t)) {
+            if (delta > 0 || std::rand() / (double) RAND_MAX < std::exp(delta / curr_t)) {
                 curr_accepted++;
             }
         }        
 
-        if (curr_accepted > this->SA_max * gamma)
+        if (curr_accepted > this->SA_max * this->gamma)
             break;
 
-        curr_t = beta * curr_t;
+        curr_t = this->beta * curr_t;
     }
 
     return curr_t;
 }
 
 template <class SolutionClass>
-SolutionClass* MHSimulatedAnnealing<SolutionClass>::run(const SolutionClass *s, double t) {
-    SolutionClass *s_prime = (SolutionClass*) s->clone();
-    SolutionClass *s_curr = (SolutionClass*) s->clone();
-
-    double curr_t = this->initial_temperature(s, this->beta, this->gamma);
-
+SolutionClass* MHSimulatedAnnealing<SolutionClass>::run(double t) {
     auto start = std::chrono::high_resolution_clock::now();
-    auto current = std::chrono::high_resolution_clock::now();
-    while (curr_t > this->t_min && std::chrono::duration<float>(current - start).count() < t) {
-        current = std::chrono::high_resolution_clock::now();
 
-        for (int i=0; i<this->SA_max && std::chrono::duration<float>(current - start).count() < t; i++) {
+    SolutionClass *s_prime = (SolutionClass*) this->s_0->clone();
+    SolutionClass *s_curr = (SolutionClass*) this->s_0->clone();
+
+    double curr_t = this->initial_temperature(this->s_0);
+    std::cout << "Simulated Annealing starting with t_0 = " << curr_t << "." << std::endl;
+
+    while (curr_t > this->t_min) {
+        auto current = std::chrono::high_resolution_clock::now();
+        if (std::chrono::duration<double>(current - start).count() >= t) {
+            std::cout << "> Simulated Annealing finished by time." << std::endl;
+            break;
+        }
+
+        for (int i=0; i<this->SA_max; i++) {
             current = std::chrono::high_resolution_clock::now();
+            if (std::chrono::duration<double>(current - start).count() >= t) break;            
 
             Movement<SolutionClass> *m = this->mg->get_random();
             if (m == NULL) break;
             
             long long delta = m->delta(s_curr);
-            if (delta > 0 || std::rand() / RAND_MAX < std::exp(delta / curr_t)) {
+            if (delta > 0 || std::rand() / (double) RAND_MAX < std::exp(delta / curr_t)) {
                 SolutionClass *s1 = (SolutionClass*) s_curr->clone();
                 m->move(s1);
                 delete s_curr;
@@ -96,6 +104,10 @@ SolutionClass* MHSimulatedAnnealing<SolutionClass>::run(const SolutionClass *s, 
         curr_t = this->alpha * curr_t;
     }
 
+    auto current = std::chrono::high_resolution_clock::now();
+    auto total_time = std::chrono::duration<double>(current - start).count();
+    std::cout << "Simulated Annealing finished after " << total_time << " seconds." << std::endl;
+
     delete s_curr;
     return s_prime;
 }
@@ -103,15 +115,13 @@ SolutionClass* MHSimulatedAnnealing<SolutionClass>::run(const SolutionClass *s, 
 template <class SolutionClass>
 MHGrasp<SolutionClass>::MHGrasp(
     Evaluator<SolutionClass> *evl,
-    MovementGenerator<SolutionClass> *mg,
-    std::function<SolutionClass*(Evaluator<SolutionClass>, double)> constructive_method,
+    SolutionClass* (*constructive_method)(Evaluator<SolutionClass>*, double),
     double alpha,
     LocalSearch<SolutionClass> *ls,
     int GRASP_max
 )
     : MetaHeuristicAlgorithm<SolutionClass>(evl)
 {
-    this->mg = mg;
     this->constructive_method = constructive_method;
     this->alpha = alpha;
     this->ls = ls;
@@ -119,17 +129,26 @@ MHGrasp<SolutionClass>::MHGrasp(
 }
 
 template <class SolutionClass>
-SolutionClass* MHGrasp<SolutionClass>::run(const SolutionClass *s, double t) {
-    SolutionClass *s_prime = (SolutionClass*) s->clone();
-
+SolutionClass* MHGrasp<SolutionClass>::run(double t) {
     auto start = std::chrono::high_resolution_clock::now();
-    for (int i=0; i<this->GRASP_max; i++) {
-        auto current = std::chrono::high_resolution_clock::now();
-        if (std::chrono::duration<float>(current - start).count() >= t) break;
 
-        SolutionClass *s_curr = this->constructive_method(this->evl, this->alpha);
-        SolutionClass *s1 = this->ls->run(s_curr, t);
-        delete s_curr;
+    std::cout << "GRASP starting." << std::endl;
+
+    SolutionClass *s_tmp = this->constructive_method(this->evl, this->alpha);
+    SolutionClass *s_prime = this->ls->run(s_tmp, t);
+    delete s_tmp;
+
+    int GRASP_curr = 0;
+    for (; GRASP_curr<this->GRASP_max; GRASP_curr++) {
+        auto current = std::chrono::high_resolution_clock::now();
+        if (std::chrono::duration<double>(current - start).count() >= t) {
+            std::cout << "> GRASP finished by time." << std::endl;
+            break;
+        }
+
+        s_tmp = this->constructive_method(this->evl, this->alpha);
+        SolutionClass *s1 = this->ls->run(s_tmp, t);
+        delete s_tmp;
 
         if (this->evl->get_evaluation(s1) > this->evl->get_evaluation(s_prime)) {
             delete s_prime;
@@ -138,6 +157,10 @@ SolutionClass* MHGrasp<SolutionClass>::run(const SolutionClass *s, double t) {
             delete s1;
         }
     }
+
+    auto current = std::chrono::high_resolution_clock::now();
+    auto total_time = std::chrono::duration<double>(current - start).count();
+    std::cout << "GRASP finished after " << total_time << " seconds and " << GRASP_curr << " iterations." << std::endl;
 
     return s_prime;
 }

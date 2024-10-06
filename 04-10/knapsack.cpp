@@ -326,7 +326,9 @@ void KnapsackInversionMovementGenerator::reset() {
     this->curr_j = 0;
 }
 
-KnapsackSolution* cm_knapsack_greedy(const KnapsackEvaluator *evl) {
+KnapsackSolution* cm_knapsack_greedy(const KnapsackEvaluator *evl, double t) {
+    auto start = std::chrono::high_resolution_clock::now();
+
     long long curr_Q = evl->q;
     KnapsackSolution *s = new KnapsackSolution(evl->n);
 
@@ -339,9 +341,12 @@ KnapsackSolution* cm_knapsack_greedy(const KnapsackEvaluator *evl) {
     });
 
     for (int g : c) {
-        if (evl->w[g] > curr_Q) {
+        auto current = std::chrono::high_resolution_clock::now();
+        if (std::chrono::duration<double>(current - start).count() > t)
+            break;
+
+        if (evl->w[g] > curr_Q)
             continue;
-        }
 
         curr_Q -= evl->w[g];
         s->set(g, true);
@@ -350,41 +355,41 @@ KnapsackSolution* cm_knapsack_greedy(const KnapsackEvaluator *evl) {
     return s;
 }
 
-KnapsackSolution* cm_knapsack_random(const KnapsackEvaluator *evl, float t) {
+KnapsackSolution* cm_knapsack_random(const KnapsackEvaluator *evl, double t) {
     auto start = std::chrono::high_resolution_clock::now();
 
     long long curr_Q = evl->q;
     KnapsackSolution *s = new KnapsackSolution(evl->n);
 
-    std::vector<int> c(evl->n);
-    iota(c.begin(), c.end(), 0);
-    sort(c.begin(), c.end(), [&](const int x, const int y) {
+    std::vector<int> c_weight_ordered(evl->n);
+    iota(c_weight_ordered.begin(), c_weight_ordered.end(), 0);
+    sort(c_weight_ordered.begin(), c_weight_ordered.end(), [&](const int x, const int y) {
         return evl->w[x] < evl->w[y];
     });
 
-    while (c.size() > 0 && curr_Q < evl->w[(*c.rbegin())]) {
-        c.pop_back();
+    while (c_weight_ordered.size() > 0 && curr_Q < evl->w[(*c_weight_ordered.rbegin())]) {
+        c_weight_ordered.pop_back();
     }
 
-    while (c.size() > 0 && curr_Q >= evl->w[c[0]]) {
+    while (c_weight_ordered.size() > 0 && curr_Q >= evl->w[c_weight_ordered[0]]) {
         auto current = std::chrono::high_resolution_clock::now();
-        if (std::chrono::duration<float>(current - start).count() > t)
+        if (std::chrono::duration<double>(current - start).count() > t)
             break;
 
-        auto g = c.begin() + (rand() % c.size());
+        auto g = c_weight_ordered.begin() + (rand() % c_weight_ordered.size());
         s->set(*g, true);
         curr_Q -= evl->w[*g];
-        c.erase(g);
+        c_weight_ordered.erase(g);
 
-        while (c.size() > 0 && curr_Q < evl->w[(*c.rbegin())]) {
-           c.pop_back();
+        while (c_weight_ordered.size() > 0 && curr_Q < evl->w[(*c_weight_ordered.rbegin())]) {
+           c_weight_ordered.pop_back();
         }
     }
 
     return s;
 }
 
-KnapsackSolution* cm_knapsack_greedy_randomized(const KnapsackEvaluator *evl, float t, float a) {
+KnapsackSolution* cm_knapsack_greedy_randomized(const KnapsackEvaluator *evl, float a, double t) {
     auto start = std::chrono::high_resolution_clock::now();
 
     KnapsackSolution *s = new KnapsackSolution(evl->n);
@@ -396,29 +401,29 @@ KnapsackSolution* cm_knapsack_greedy_randomized(const KnapsackEvaluator *evl, fl
         values.push_back(value);
     }
 
-    std::vector<int> c(evl->n), c_value_ordered(evl->n);
-    std::iota(c.begin(), c.end(), 0);
+    std::vector<int> c_weight_ordered(evl->n), c_value_ordered(evl->n);
+    std::iota(c_weight_ordered.begin(), c_weight_ordered.end(), 0);
     std::iota(c_value_ordered.begin(), c_value_ordered.end(), 0);
 
-    std::sort(c.rbegin(), c.rend(), [&](const int x, const int y) {
-        return evl->w[x] < evl->w[y];
+    std::sort(c_weight_ordered.rbegin(), c_weight_ordered.rend(), [&](const int x, const int y) {
+        return evl->w[x] > evl->w[y];
     });
 
     std::sort(c_value_ordered.rbegin(), c_value_ordered.rend(), [&](const int x, const int y) {
         return values[x] < values[y];
     });
 
-    while (c.size() > 0 && evl->w[*c.begin()] > curr_Q) {
+    while (c_weight_ordered.size() > 0 && evl->w[*c_weight_ordered.rbegin()] > curr_Q) {
+        c_weight_ordered.pop_back();
         c_value_ordered.erase(
-            std::remove(c_value_ordered.begin(), c_value_ordered.end(), *c.begin()),
+            std::remove(c_value_ordered.begin(), c_value_ordered.end(), *c_weight_ordered.begin()),
             c_value_ordered.end()
         );
-        c.erase(c.begin());
     }
 
-    while (c.size() > 0) {
+    while (c_weight_ordered.size() > 0) {
         auto current = std::chrono::high_resolution_clock::now();
-        if (std::chrono::duration<float>(current - start).count() > t)
+        if (std::chrono::duration<double>(current - start).count() > t)
             break;
 
         float min_value = values[c_value_ordered.back()],
@@ -441,15 +446,15 @@ KnapsackSolution* cm_knapsack_greedy_randomized(const KnapsackEvaluator *evl, fl
         curr_Q -= evl->w[g];
         s->set(g, true);
 
-        c.erase(std::remove(c.begin(), c.end(), g), c.end());
+        c_weight_ordered.erase(std::remove(c_weight_ordered.begin(), c_weight_ordered.end(), g), c_weight_ordered.end());
         c_value_ordered.erase(std::remove(c_value_ordered.begin(), c_value_ordered.end(), g), c_value_ordered.end());
 
-        while (c.size() > 0 && evl->w[*c.begin()] > curr_Q) {
+        while (c_weight_ordered.size() > 0 && evl->w[*c_weight_ordered.rbegin()] > curr_Q) {
+            c_weight_ordered.pop_back();
             c_value_ordered.erase(
-                remove(c_value_ordered.begin(), c_value_ordered.end(), *c.begin()),
+                remove(c_value_ordered.begin(), c_value_ordered.end(), *c_weight_ordered.begin()),
                 c_value_ordered.end()
             );
-            c.erase(c.begin());
         }
     }
 
