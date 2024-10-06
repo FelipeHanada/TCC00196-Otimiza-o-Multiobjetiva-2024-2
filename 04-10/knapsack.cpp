@@ -198,7 +198,7 @@ Knapsack2FlipBitMovementGenerator::Knapsack2FlipBitMovementGenerator(KnapsackEva
     this->curr_j = 0;
 }
 
-std::vector<Movement<KnapsackSolution>*> Knapsack2FlipBitMovementGenerator::get_all(const KnapsackSolution &s) {
+std::vector<Movement<KnapsackSolution>*> Knapsack2FlipBitMovementGenerator::get_all(const KnapsackSolution *s) {
     std::vector<Movement<KnapsackSolution>*> movements;
     for (int i = 0; i < this->n; i++) {
         for (int j = i; j < this->n; j++) {
@@ -242,7 +242,7 @@ KnapsackIntervalFlipBitMovementGenerator::KnapsackIntervalFlipBitMovementGenerat
     this->curr_j = 0;
 }
 
-std::vector<Movement<KnapsackSolution>*> KnapsackIntervalFlipBitMovementGenerator::get_all(const KnapsackSolution &s) {
+std::vector<Movement<KnapsackSolution>*> KnapsackIntervalFlipBitMovementGenerator::get_all(const KnapsackSolution *s) {
     std::vector<Movement<KnapsackSolution>*> movements;
     for (int i = 0; i < this->n; i++) {
         for (int j = i; j < this->n; j++) {
@@ -286,7 +286,7 @@ KnapsackInversionMovementGenerator::KnapsackInversionMovementGenerator(KnapsackE
     this->curr_j = 0;
 }
 
-std::vector<Movement<KnapsackSolution>*> KnapsackInversionMovementGenerator::get_all(const KnapsackSolution &s) {
+std::vector<Movement<KnapsackSolution>*> KnapsackInversionMovementGenerator::get_all(const KnapsackSolution *s) {
     std::vector<Movement<KnapsackSolution>*> movements;
     for (int i = 0; i < this->n; i++) {
         for (int j = i; j < this->n; j++) {

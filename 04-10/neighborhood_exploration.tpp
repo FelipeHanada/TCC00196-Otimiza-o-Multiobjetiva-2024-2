@@ -94,12 +94,14 @@ Movement<SolutionClass>* NEFindBest<SolutionClass>::get_movement(const SolutionC
 }
 
 template <class SolutionClass>
-std::vector<SolutionClass> all_neighbors(SolutionClass &s, MovementGenerator<SolutionClass> *mg) {
+std::vector<SolutionClass*> all_neighbors(SolutionClass *s, MovementGenerator<SolutionClass> *mg) {
     static_assert(std::is_base_of<Solution, SolutionClass>::value, "SolutionClass must be a descendant of Solution");
 
-    std::vector<SolutionClass> r;
-    for (Movement<SolutionClass> *m : mg->get(s)) {
-        r.push_back(m->move(s));
+    std::vector<SolutionClass*> r;
+    for (Movement<SolutionClass> *m : mg->get_all(s)) {
+        SolutionClass *s1 = (SolutionClass*) s->clone();
+        m->move(s1);
+        r.push_back(s1);
         delete m;
     }
 

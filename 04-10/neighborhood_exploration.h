@@ -54,7 +54,7 @@ public:
 };
 
 template <typename SolutionClass>
-std::vector<SolutionClass> all_neighbors(SolutionClass &s, MovementGenerator<SolutionClass> *mg);
+std::vector<SolutionClass*> all_neighbors(SolutionClass *s, MovementGenerator<SolutionClass> *mg);
 
 template <typename SolutionClass>
 class RefinementHeuristicsMethod {
